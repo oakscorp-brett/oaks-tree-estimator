@@ -17,12 +17,16 @@ const PRICES = {
   removal: {              // per tree (EXAMPLE placeholders)
     small:  [300, 700],   // under 30 ft
     medium: [700, 1500],  // 30–60 ft
-    large:  [1500, 3500]  // over 60 ft
+    large:  [1500, 3500], // 60–80 ft
+    xl:     [3000, 6000], // 80–100 ft
+    huge:   [5000, 10000] // 100 ft+
   },
   trimming: {             // per tree (EXAMPLE placeholders)
     small:  [150, 400],
     medium: [400, 900],
-    large:  [900, 2000]
+    large:  [900, 2000],  // 60–80 ft
+    xl:     [1500, 3000], // 80–100 ft
+    huge:   [2500, 5000]  // 100 ft+
   },
   stump: {                // stump grinding (EXAMPLE placeholders)
     perInchDiameter: [3, 5],  // $ per inch of diameter, per stump
@@ -46,7 +50,10 @@ const PRICES = {
   // Both can apply (they add together).
   septic: { path: 0.15, near: 0.10 },
   // Cleanup/haul-away, percent added to a tree's price — EXAMPLE placeholder
-  haulAway: 0.20
+  haulAway: 0.20,
+  // Tree type multiplier (1 = no change). All 1 for now — hook for later.
+  treeType: { douglasfir:1, redcedar:1, bigleafmaple:1, alder:1, oak:1, cottonwood:1,
+              hemlock:1, pine:1, birch:1, cherry:1, other:1, unsure:1 }
 };
 </script>
 <style>
@@ -141,6 +148,7 @@ footer{text-align:center;font-size:13px;color:#8a8579;padding:10px 0 30px}
 .fact-h{display:flex;align-items:center;gap:7px;font:700 13px Montserrat,sans-serif;letter-spacing:.8px;text-transform:uppercase;color:var(--b2)}.fact-h svg{width:18px;height:18px}
 .fact-t{margin:6px 0 4px;font-size:15px;line-height:1.45;min-height:3em;transition:opacity .4s}.fact-s{font-size:12px;color:var(--mut);text-decoration:underline;transition:opacity .4s}
 .notesbox{background:#fffaf2;border:2px solid #e6d6bf;border-radius:16px;padding:14px;margin-top:18px}.notesbox .fl{margin-top:0;font-size:17px;color:var(--b)}.notesbox textarea{min-height:110px}
+select{width:100%;font:16.5px Inter,sans-serif;padding:13px;border:2px solid #e3ddd1;border-radius:14px;background:#fff;color:var(--t)}
 </style>
 </head>
 <body>
@@ -254,9 +262,13 @@ function next1(){if(!sel.size){$('err1').style.display='block';return}
  $('removalSec').style.display=sel.has('removal')?'':'none';$('trimSec').style.display=sel.has('trimming')?'':'none';$('stumpSec').style.display=sel.has('stump')?'':'none';
  if(sel.has('removal')&&!$('removalList').children.length)addTree('removal');if(sel.has('trimming')&&!$('trimList').children.length)addTree('trimming');go(2)}
 function seg(cls,opts){return `<div class="seg" data-k="${cls}">${opts.map((o,i)=>`<button type="button" data-v="${o[0]}" class="${i?'':'sel'}">${o[1]}<small>${o[2]}</small></button>`).join('')}</div>`}
+const TYPES=[['unsure','Not sure'],['oak','Oak (Garry / Oregon white oak)'],['douglasfir','Douglas fir'],['redcedar','Western red cedar'],['bigleafmaple','Big leaf maple'],['alder','Alder'],['cottonwood','Cottonwood'],['hemlock','Hemlock'],['pine','Pine'],['birch','Birch'],['cherry','Cherry / fruit tree'],['other','Other']];
+const typeName=t=>{const v=t.querySelector('.ttype').value;return v==='other'?(t.querySelector('.tother').value.trim()||'Other'):TYPES.find(x=>x[0]===v)[1]};
 function addTree(type){const list=$(type==='removal'?'removalList':'trimList');const el=document.createElement('div');el.className='tree';el.dataset.type=type;
  el.innerHTML=`<div class="tree-h"><h3>Tree ${list.children.length+1}</h3><button class="x" type="button">Remove</button></div>
- <span class="fl">Size</span>${seg('size',[['small','Small','under 30 ft'],['medium','Medium','30–60 ft'],['large','Large','60 ft +']])}
+ <span class="fl">Size</span>${seg('size',[['small','Small','under 30 ft'],['medium','Medium','30–60 ft'],['large','Large','60–80 ft'],['xl','Extra large','80–100 ft'],['huge','Huge','100 ft+']])}
+ <span class="fl">What type of tree is it?</span><select class="ttype">${TYPES.map(t=>`<option value="${t[0]}">${t[1]}</option>`).join('')}</select>
+ <input class="tother" placeholder="What kind of tree?" style="display:none;margin-top:8px">
  <span class="fl">What is it near? <span class="hint">Pick all that apply</span></span>
  <div class="multi" data-k="near"><button type="button" data-v="powerlines">Power lines</button><button type="button" data-v="house">House / structure</button><button type="button" data-v="fence">Fence / shed</button><button type="button" data-v="road">Road / driveway</button><button type="button" data-v="open" data-x="1" class="full sel">Open area, nothing nearby</button></div>
  <span class="fl">How wide is the way in to the tree?</span>
@@ -267,6 +279,7 @@ function addTree(type){const list=$(type==='removal'?'removalList':'trimList');c
  <label class="tog"><input type="checkbox" class="haul" checked><i></i>Clean up &amp; haul away debris</label>
  <span class="fl">Notes about this tree (optional)</span><textarea class="tnotes" rows="2" placeholder="Species, leaning, dead limbs, anything else"></textarea>`;
  el.querySelector('.x').onclick=()=>{el.remove();[...list.children].forEach((t,i)=>t.querySelector('h3').textContent='Tree '+(i+1))};
+ el.querySelector('.ttype').onchange=e=>{el.querySelector('.tother').style.display=e.target.value==='other'?'block':'none'};
  el.querySelectorAll('.multi').forEach(g=>g.onclick=e=>{const b=e.target.closest('button');if(!b)return;
   if(b.dataset.x){g.querySelectorAll('button').forEach(x=>x.classList.toggle('sel',x===b))}else{b.classList.toggle('sel');g.querySelectorAll('[data-x]').forEach(x=>x.classList.remove('sel'));
   if(!g.querySelector('.sel'))g.querySelector('[data-x]').classList.add('sel')}});
@@ -297,7 +310,7 @@ function showFact(fade){const f=FACTS[fi%FACTS.length];document.querySelectorAll
 showFact(false);setInterval(()=>{fi++;showFact(true)},9000);
 let when='';document.querySelectorAll('.wopt').forEach(o=>o.onclick=()=>{document.querySelectorAll('.wopt').forEach(x=>x.classList.toggle('sel',x===o));when=o.dataset.v;$('emNote').style.display=when.startsWith('ASAP')?'flex':'none'});
 const fmt=v=>'$'+(Math.round(v/10)*10).toLocaleString();const val=(t,k)=>t.querySelector(`.seg[data-k="${k}"] .sel`).dataset.v;
-const NAMES={removal:'Removal',trimming:'Trimming',small:'small',medium:'medium',large:'large'};
+const NAMES={xl:'extra large',huge:'huge',removal:'Removal',trimming:'Trimming',small:'small',medium:'medium',large:'large'};
 const LBL={powerlines:'power lines',house:'house/structure',fence:'fence/shed',road:'road/driveway',open:'open area',wide:'wide open 10 ft+',gate:'gate/path 6–10 ft',narrow:'narrow 3–6 ft',none:'under 3 ft / none',no:'no',unsure:'not sure',path:'in access path',near:'near tree'};
 const multi=(t,k)=>[...t.querySelectorAll(`.multi[data-k="${k}"] .sel`)].map(b=>b.dataset.v);
 let treeInfo=[],septicFlag=false;
@@ -308,10 +321,10 @@ function calc(){let lo=0,hi=0;const lines=[];treeInfo=[];septicFlag=false;
   const acc=t.querySelector('.acc .sel').dataset.v,sep=multi(t,'septic'),sepAdd=sep.reduce((a,v)=>a+(PRICES.septic[v]||0),0);
   if(sep.includes('path')||sep.includes('near'))septicFlag=true;
   const gw=t.querySelector('.gwidth').value,haul=t.querySelector('.haul').checked;
-  const m=1+hazAdd+PRICES.access[acc]+sepAdd+(haul?PRICES.haulAway:0);
-  const name=`${NAMES[t.dataset.type]} · ${t.querySelector('h3').textContent.toLowerCase()} (${val(t,'size')})`;
-  const det=`Near: ${(near.length?near:['open']).map(v=>LBL[v]).join(', ')} · Access: ${LBL[acc]}${gw?` (gate ${gw} ft)`:''} · Septic/drain field: ${sep.map(v=>LBL[v]).join(' + ')}${haul?' · Haul-away':''}`;
-  treeInfo.push({service:t.dataset.type,size:val(t,'size'),near:near.length?near:['open'],access:acc,gateWidthFt:gw||null,septic:sep,haulAway:haul,notes:t.querySelector('.tnotes').value,range:fmt(b[0]*m)+'–'+fmt(b[1]*m)});
+  const tm=PRICES.treeType[t.querySelector('.ttype').value]||1;const m=tm*(1+hazAdd+PRICES.access[acc]+sepAdd+(haul?PRICES.haulAway:0));
+  const name=`${NAMES[t.dataset.type]} · ${t.querySelector('h3').textContent.toLowerCase()} (${NAMES[val(t,'size')]})`;
+  const det=`Type: ${typeName(t)} · Near: ${(near.length?near:['open']).map(v=>LBL[v]).join(', ')} · Access: ${LBL[acc]}${gw?` (gate ${gw} ft)`:''} · Septic/drain field: ${sep.map(v=>LBL[v]).join(' + ')}${haul?' · Haul-away':''}`;
+  treeInfo.push({service:t.dataset.type,size:val(t,'size'),treeType:typeName(t),near:near.length?near:['open'],access:acc,gateWidthFt:gw||null,septic:sep,haulAway:haul,notes:t.querySelector('.tnotes').value,range:fmt(b[0]*m)+'–'+fmt(b[1]*m)});
   lo+=b[0]*m;hi+=b[1]*m;lines.push([name+`<span class="sub2">${det}</span>`,fmt(b[0]*m)+'–'+fmt(b[1]*m)])});
  if(sel.has('stump')){const c=Math.max(1,+$('stumpCount').value||1),d=Math.max(1,+$('stumpDia').value||1),s=PRICES.stump;
   let sl=c*Math.max(s.minimumPerStump[0],d*s.perInchDiameter[0]),sh=c*Math.max(s.minimumPerStump[1],d*s.perInchDiameter[1]);
