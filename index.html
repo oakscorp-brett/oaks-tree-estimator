@@ -149,6 +149,13 @@ footer{text-align:center;font-size:13px;color:#8a8579;padding:10px 0 30px}
 .fact-t{margin:6px 0 4px;font-size:15px;line-height:1.45;min-height:3em;transition:opacity 1s ease-in-out}.fact-s{font-size:12px;color:var(--mut);text-decoration:underline;transition:opacity 1s ease-in-out}
 .notesbox{background:#fffaf2;border:2px solid #e6d6bf;border-radius:16px;padding:14px;margin-top:18px}.notesbox .fl{margin-top:0;font-size:17px;color:var(--b)}.notesbox textarea{min-height:110px}
 select{width:100%;font:16.5px Inter,sans-serif;padding:13px;border:2px solid #e3ddd1;border-radius:14px;background:#fff;color:var(--t)}
+.sum{background:#fff;border-radius:var(--r);box-shadow:var(--sh);padding:18px;margin:0 0 14px;text-align:left}
+.sum h3{margin:0 0 4px;font-size:19px;color:var(--g)}
+.sg{border-top:1px solid #eee7da;padding:12px 0 4px}.sg:first-of-type{border-top:0}
+.sg-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}.sg-h b{font:700 15px Montserrat,sans-serif;color:var(--b)}
+.edit{border:0;background:var(--gl);color:var(--g);font:600 13px Inter;padding:6px 12px;border-radius:99px;cursor:pointer}
+.kv{display:grid;grid-template-columns:118px 1fr;gap:4px 10px;font-size:14.5px;padding:2px 0 8px}.kv dt{color:var(--mut)}.kv dd{margin:0;font-weight:600;word-break:break-word}
+.tsub{font-weight:700;font-size:14.5px;margin:6px 0 2px;color:var(--t)}
 </style>
 </head>
 <body>
@@ -219,6 +226,7 @@ select{width:100%;font:16.5px Inter,sans-serif;padding:13px;border:2px solid #e3
 <div class="disc"><svg width="15" height="15"><use href="#i-info"/></svg>Estimate only, confirmed on-site</div>
 <div class="lines" id="lines"></div>
 <div class="snote" id="septicNote" style="display:none"><svg width="18" height="18" style="flex:0 0 18px"><use href="#i-info"/></svg><span>Septic tanks and drain fields need careful equipment planning. We'll confirm how to protect them during the on-site visit.</span></div></div>
+<div class="sum" id="sumEst"></div>
 <p class="fine">This is a rough estimate based on your answers. Your final price is confirmed after we look at the trees in person.</p>
 <div class="fact"><div class="fact-h"><svg><use href="#i-leaf"/></svg>Did you know?</div><p class="fact-t"></p><a class="fact-s" target="_blank" rel="noopener"></a></div>
 <div class="xtra"><svg><use href="#i-leaf"/></svg><span><b>We also do land clearing &amp; excavation.</b> Ask us about it when we call.</span></div>
@@ -249,7 +257,8 @@ select{width:100%;font:16.5px Inter,sans-serif;padding:13px;border:2px solid #e3
 
 <!-- DONE -->
 <section class="step" data-step="6"><div class="card done"><div class="big"><svg><use href="#i-check"/></svg></div>
-<h2>Thank you!</h2><p class="sub" style="margin:0">We got your request and will be in touch soon to confirm your estimate.</p></div><div class="xtra"><svg><use href="#i-leaf"/></svg><span><b>We also do land clearing &amp; excavation.</b> Ask us about it when we call.</span></div></section>
+<h2>Thank you!</h2><p class="sub" style="margin:0">We got your request and will be in touch soon to confirm your estimate.</p></div>
+<div class="sum" id="sumDone"></div><div class="xtra"><svg><use href="#i-leaf"/></svg><span><b>We also do land clearing &amp; excavation.</b> Ask us about it when we call.</span></div></section>
 </main>
 <footer>Oaks Corp LLC · Tree removal · Trimming · Stump grinding</footer>
 
@@ -314,6 +323,20 @@ const NAMES={xl:'extra large',huge:'huge',removal:'Removal',trimming:'Trimming',
 const LBL={powerlines:'power lines',house:'house/structure',fence:'fence/shed',road:'road/driveway',open:'open area',wide:'wide open 10 ft+',gate:'gate/path 6–10 ft',narrow:'narrow 3–6 ft',none:'under 3 ft / none',no:'no',unsure:'not sure',path:'in access path',near:'near tree'};
 const multi=(t,k)=>[...t.querySelectorAll(`.multi[data-k="${k}"] .sel`)].map(b=>b.dataset.v);
 let treeInfo=[],septicFlag=false;
+const esc=x=>String(x??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const kv=rows=>'<dl class="kv">'+rows.filter(r=>r[1]!==''&&r[1]!=null).map(r=>`<dt>${r[0]}</dt><dd>${esc(r[1])}</dd>`).join('')+'</dl>';
+const grp=(title,step,body,done)=>`<div class="sg"><div class="sg-h"><b>${title}</b>${done?'':`<button class="edit" type="button" onclick="go(${step})">Edit</button>`}</div>${body}</div>`;
+const SVC={removal:'Tree removal',trimming:'Tree trimming',stump:'Stump grinding'};
+function summary(done){let h='<h3>Your answers</h3>';
+ h+=grp('Services',1,kv([['Chosen',[...sel].map(v=>SVC[v]).join(', ')]]),done);
+ treeInfo.forEach((t,i)=>{h+=grp(`${SVC[t.service]} · Tree ${treeInfo.slice(0,i+1).filter(x=>x.service===t.service).length}`,2,kv([
+  ['Type',t.treeType],['Size',{small:'Small (under 30 ft)',medium:'Medium (30–60 ft)',large:'Large (60–80 ft)',xl:'Extra large (80–100 ft)',huge:'Huge (100 ft+)'}[t.size]],
+  ['Near',t.near.map(v=>LBL[v]).join(', ')],['Access',LBL[t.access]+(t.gateWidthFt?` · gate ${t.gateWidthFt} ft`:'')],
+  ['Septic / drain field',t.septic.map(v=>LBL[v]).join(' + ')],['Haul-away',t.haulAway?'Yes':'No'],['Notes',t.notes]]),done)});
+ if(sel.has('stump'))h+=grp('Stump grinding',2,kv([['Stumps',$('stumpCount').value],['Avg. width',$('stumpDia').value+' in']]),done);
+ h+=grp('Photos',3,kv([['Photos added',photos.length||'None']]),done);
+ if(done)h+=grp('Timing &amp; contact',5,kv([['When',when||'Not chosen'],['Preferred date',$('pdate').value],['Land clearing / excavation',$('landX').checked?'Interested':'No'],['Notes',$('notes').value]]),true);
+ return h}
 function calc(){let lo=0,hi=0;const lines=[];treeInfo=[];septicFlag=false;
  document.querySelectorAll('.tree').forEach(t=>{if(!sel.has(t.dataset.type))return;const b=PRICES[t.dataset.type][val(t,'size')];
   const near=multi(t,'near').filter(v=>v!=='open'),hz=near.map(v=>PRICES.nearHazards[v]).sort((a,b)=>b-a);
@@ -325,11 +348,12 @@ function calc(){let lo=0,hi=0;const lines=[];treeInfo=[];septicFlag=false;
   const name=`${NAMES[t.dataset.type]} · ${t.querySelector('h3').textContent.toLowerCase()} (${NAMES[val(t,'size')]})`;
   const det=`Type: ${typeName(t)} · Near: ${(near.length?near:['open']).map(v=>LBL[v]).join(', ')} · Access: ${LBL[acc]}${gw?` (gate ${gw} ft)`:''} · Septic/drain field: ${sep.map(v=>LBL[v]).join(' + ')}${haul?' · Haul-away':''}`;
   treeInfo.push({service:t.dataset.type,size:val(t,'size'),treeType:typeName(t),near:near.length?near:['open'],access:acc,gateWidthFt:gw||null,septic:sep,haulAway:haul,notes:t.querySelector('.tnotes').value,range:fmt(b[0]*m)+'–'+fmt(b[1]*m)});
-  lo+=b[0]*m;hi+=b[1]*m;lines.push([name+`<span class="sub2">${det}</span>`,fmt(b[0]*m)+'–'+fmt(b[1]*m)])});
+  lo+=b[0]*m;hi+=b[1]*m;lines.push([name,fmt(b[0]*m)+'–'+fmt(b[1]*m)])});
  if(sel.has('stump')){const c=Math.max(1,+$('stumpCount').value||1),d=Math.max(1,+$('stumpDia').value||1),s=PRICES.stump;
   let sl=c*Math.max(s.minimumPerStump[0],d*s.perInchDiameter[0]),sh=c*Math.max(s.minimumPerStump[1],d*s.perInchDiameter[1]);
   if(lo===0){sl=Math.max(sl,s.tripMinimum[0]);sh=Math.max(sh,s.tripMinimum[1])}lo+=sl;hi+=sh;lines.push([`Stump grinding · ${c} × ${d}"`,fmt(sl)+'–'+fmt(sh)])}
  if(photos.length)lines.push(['Photos attached',photos.length]);
+ $('sumEst').innerHTML=summary(false);
  $('septicNote').style.display=septicFlag?'flex':'none';
  $('range').textContent=fmt(lo)+' – '+fmt(hi);$('lines').innerHTML=lines.map(l=>`<div><span>${l[0]}</span><span>${l[1]}</span></div>`).join('')}
 $('leadForm').onsubmit=e=>{e.preventDefault();if(!$('name').value.trim()||!$('phone').value.trim()){$('err5').style.display='block';return}
@@ -337,7 +361,7 @@ $('leadForm').onsubmit=e=>{e.preventDefault();if(!$('name').value.trim()||!$('ph
  // TODO: send `lead` to a backend (e.g. Formspree or an email service). Build a FormData, append each
  // photo with fd.append('photos', file), then fetch(ENDPOINT,{method:'POST',body:fd}).
  // Right now nothing is stored or sent anywhere.
- console.log('Lead (not sent yet):',lead);go(6)};
+ console.log('Lead (not sent yet):',lead);$('sumDone').innerHTML=summary(true);go(6)};
 </script>
 </body>
 </html>
