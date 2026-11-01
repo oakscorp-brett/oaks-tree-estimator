@@ -114,6 +114,7 @@ input:focus,textarea:focus{outline:0;border-color:var(--g2);box-shadow:0 0 0 4px
 .err{color:#b04a2e;font-size:14px;font-weight:600;margin-top:10px;display:none}
 .done{text-align:center;padding:34px 20px}.done .big{width:84px;height:84px;margin:0 auto 12px;border-radius:50%;background:var(--gl);display:grid;place-items:center;color:var(--g2)}.done .big svg{width:46px;height:46px}
 footer{text-align:center;font-size:13px;color:#8a8579;padding:10px 0 30px}
+.xtra{display:flex;gap:10px;align-items:center;background:#f4ebdf;border:1px solid #e6d6bf;color:#5b3d22;border-radius:14px;padding:12px 14px;font-size:14.5px;margin:0 0 14px}.xtra svg{flex:0 0 22px;width:22px;height:22px;color:var(--b2)}
 </style>
 </head>
 <body>
@@ -153,6 +154,7 @@ footer{text-align:center;font-size:13px;color:#8a8579;padding:10px 0 30px}
 <div class="opt" data-svc="trimming"><div class="ic"><svg><use href="#i-trim"/></svg></div><div><b>Tree trimming</b><small>Prune, thin, or shape</small></div><div class="ck"><svg><use href="#i-check"/></svg></div></div>
 <div class="opt" data-svc="stump"><div class="ic"><svg><use href="#i-stump"/></svg></div><div><b>Stump grinding</b><small>Grind stumps below ground</small></div><div class="ck"><svg><use href="#i-check"/></svg></div></div>
 </div><div class="err" id="err1">Please pick at least one service.</div></div>
+<div class="xtra"><svg><use href="#i-leaf"/></svg><span><b>We also do land clearing &amp; excavation.</b> Ask us about it when we call.</span></div>
 <button class="btn" onclick="next1()">Continue →</button></section>
 
 <!-- STEP 2: details -->
@@ -181,6 +183,7 @@ footer{text-align:center;font-size:13px;color:#8a8579;padding:10px 0 30px}
 <div class="disc"><svg width="15" height="15"><use href="#i-info"/></svg>Estimate only, confirmed on-site</div>
 <div class="lines" id="lines"></div></div>
 <p class="fine">This is a rough estimate based on your answers. Your final price is confirmed after we look at the trees in person.</p>
+<div class="xtra"><svg><use href="#i-leaf"/></svg><span><b>We also do land clearing &amp; excavation.</b> Ask us about it when we call.</span></div>
 <div class="nav"><button class="btn back" onclick="go(3)">←</button><button class="btn brown" onclick="go(5)">Get my exact quote →</button></div></section>
 
 <!-- STEP 5: contact -->
@@ -201,13 +204,14 @@ footer{text-align:center;font-size:13px;color:#8a8579;padding:10px 0 30px}
 <span class="fl">Email (optional)</span><input id="email" type="email" autocomplete="email">
 <span class="fl">Job address or city (optional)</span><input id="addr" autocomplete="street-address">
 <span class="fl">Notes (optional)</span><textarea id="notes" rows="3" placeholder="Gate code, best time to call, anything else"></textarea>
+<label class="tog"><input type="checkbox" id="landX"><i></i>I'm also interested in land clearing or excavation</label>
 <div class="err" id="err5">Please enter your name and phone number.</div>
 <div class="nav" style="margin-top:18px"><button type="button" class="btn back" onclick="go(4)">←</button><button class="btn brown" type="submit">Send my request</button></div>
 </form></div></section>
 
 <!-- DONE -->
 <section class="step" data-step="6"><div class="card done"><div class="big"><svg><use href="#i-check"/></svg></div>
-<h2>Thank you!</h2><p class="sub" style="margin:0">We got your request and will be in touch soon to confirm your estimate.</p></div></section>
+<h2>Thank you!</h2><p class="sub" style="margin:0">We got your request and will be in touch soon to confirm your estimate.</p></div><div class="xtra"><svg><use href="#i-leaf"/></svg><span><b>We also do land clearing &amp; excavation.</b> Ask us about it when we call.</span></div></section>
 </main>
 <footer>Oaks Corp LLC · Tree removal · Trimming · Stump grinding</footer>
 
@@ -249,7 +253,7 @@ function calc(){let lo=0,hi=0;const lines=[];
  if(photos.length)lines.push(['Photos attached',photos.length]);
  $('range').textContent=fmt(lo)+' – '+fmt(hi);$('lines').innerHTML=lines.map(l=>`<div><span>${l[0]}</span><span>${l[1]}</span></div>`).join('')}
 $('leadForm').onsubmit=e=>{e.preventDefault();if(!$('name').value.trim()||!$('phone').value.trim()){$('err5').style.display='block';return}
- const lead={name:$('name').value,phone:$('phone').value,email:$('email').value,address:$('addr').value,notes:$('notes').value,services:[...sel],estimate:$('range').textContent,timeline:when,preferredDate:$('pdate').value,photos:photos.map(p=>p.file)};
+ const lead={name:$('name').value,phone:$('phone').value,email:$('email').value,address:$('addr').value,notes:$('notes').value,services:[...sel],estimate:$('range').textContent,timeline:when,preferredDate:$('pdate').value,landClearingInterest:$('landX').checked,photos:photos.map(p=>p.file)};
  // TODO: send `lead` to a backend (e.g. Formspree or an email service). Build a FormData, append each
  // photo with fd.append('photos', file), then fetch(ENDPOINT,{method:'POST',body:fd}).
  // Right now nothing is stored or sent anywhere.
