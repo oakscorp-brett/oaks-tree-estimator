@@ -195,7 +195,7 @@ select{width:100%;font:16.5px Inter,sans-serif;padding:13px;border:2px solid #e3
 <div class="opt" data-svc="trimming"><div class="ic"><svg><use href="#i-trim"/></svg></div><div><b>Tree trimming</b><small>Prune, thin, or shape</small></div><div class="ck"><svg><use href="#i-check"/></svg></div></div>
 <div class="opt" data-svc="stump"><div class="ic"><svg><use href="#i-stump"/></svg></div><div><b>Stump grinding</b><small>Grind stumps below ground</small></div><div class="ck"><svg><use href="#i-check"/></svg></div></div>
 </div><div class="err" id="err1">Please pick at least one service.</div></div>
-<div class="xtra"><svg><use href="#i-leaf"/></svg><span><b>We also do land clearing &amp; excavation.</b> Ask us about it when we call.</span></div>
+<div class="xtra"><svg><use href="#i-leaf"/></svg><span><b>We also do land clearing, excavation, site prep, utilities &amp; drainage.</b> Ask us about it when we call.</span></div>
 <div class="fact"><div class="fact-h"><svg><use href="#i-leaf"/></svg>Did you know?</div><p class="fact-t"></p><a class="fact-s" target="_blank" rel="noopener"></a></div>
 <button class="btn" onclick="next1()">Continue →</button></section>
 
@@ -229,7 +229,7 @@ select{width:100%;font:16.5px Inter,sans-serif;padding:13px;border:2px solid #e3
 <div class="sum" id="sumEst"></div>
 <p class="fine">This is a rough estimate based on your answers. Your final price is confirmed after we look at the trees in person.</p>
 <div class="fact"><div class="fact-h"><svg><use href="#i-leaf"/></svg>Did you know?</div><p class="fact-t"></p><a class="fact-s" target="_blank" rel="noopener"></a></div>
-<div class="xtra"><svg><use href="#i-leaf"/></svg><span><b>We also do land clearing &amp; excavation.</b> Ask us about it when we call.</span></div>
+<div class="xtra"><svg><use href="#i-leaf"/></svg><span><b>We also do land clearing, excavation, site prep, utilities &amp; drainage.</b> Ask us about it when we call.</span></div>
 <div class="nav"><button class="btn back" onclick="go(3)">←</button><button class="btn brown" onclick="go(5)">Get my exact quote →</button></div></section>
 
 <!-- STEP 5: contact -->
@@ -250,7 +250,7 @@ select{width:100%;font:16.5px Inter,sans-serif;padding:13px;border:2px solid #e3
 <span class="fl">Email (optional)</span><input id="email" type="email" autocomplete="email">
 <span class="fl">Job address or city (optional)</span><input id="addr" autocomplete="street-address">
 <div class="notesbox"><span class="fl">📝 Notes</span><textarea id="notes" rows="4" placeholder="Anything else we should know? Gate codes, dogs, tree species, concerns, best time to call..."></textarea></div>
-<label class="tog"><input type="checkbox" id="landX"><i></i>I'm also interested in land clearing or excavation</label>
+<label class="tog"><input type="checkbox" id="landX"><i></i>I'm also interested in land clearing, excavation, site prep, utilities or drainage</label>
 <div class="err" id="err5">Please enter your name and phone number.</div>
 <div class="nav" style="margin-top:18px"><button type="button" class="btn back" onclick="go(4)">←</button><button class="btn brown" type="submit">Send my request</button></div>
 </form></div></section>
@@ -258,7 +258,7 @@ select{width:100%;font:16.5px Inter,sans-serif;padding:13px;border:2px solid #e3
 <!-- DONE -->
 <section class="step" data-step="6"><div class="card done"><div class="big"><svg><use href="#i-check"/></svg></div>
 <h2>Thank you!</h2><p class="sub" style="margin:0">We got your request and will be in touch soon to confirm your estimate.</p></div>
-<div class="sum" id="sumDone"></div><div class="xtra"><svg><use href="#i-leaf"/></svg><span><b>We also do land clearing &amp; excavation.</b> Ask us about it when we call.</span></div></section>
+<div class="sum" id="sumDone"></div><div class="xtra"><svg><use href="#i-leaf"/></svg><span><b>We also do land clearing, excavation, site prep, utilities &amp; drainage.</b> Ask us about it when we call.</span></div></section>
 </main>
 <footer>Oaks Corp LLC · Tree removal · Trimming · Stump grinding</footer>
 
@@ -335,7 +335,7 @@ function summary(done){let h='<h3>Your answers</h3>';
   ['Septic / drain field',t.septic.map(v=>LBL[v]).join(' + ')],['Haul-away',t.haulAway?'Yes':'No'],['Notes',t.notes]]),done)});
  if(sel.has('stump'))h+=grp('Stump grinding',2,kv([['Stumps',$('stumpCount').value],['Avg. width',$('stumpDia').value+' in']]),done);
  h+=grp('Photos',3,kv([['Photos added',photos.length||'None']]),done);
- if(done)h+=grp('Timing &amp; contact',5,kv([['When',when||'Not chosen'],['Preferred date',$('pdate').value],['Land clearing / excavation',$('landX').checked?'Interested':'No'],['Notes',$('notes').value]]),true);
+ if(done)h+=grp('Timing &amp; contact',5,kv([['When',when||'Not chosen'],['Preferred date',$('pdate').value],['Land clearing, excavation, site prep, utilities / drainage',$('landX').checked?'Interested':'No'],['Notes',$('notes').value]]),true);
  return h}
 function calc(){let lo=0,hi=0;const lines=[];treeInfo=[];septicFlag=false;
  document.querySelectorAll('.tree').forEach(t=>{if(!sel.has(t.dataset.type))return;const b=PRICES[t.dataset.type][val(t,'size')];
