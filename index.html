@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Free Tree Service Estimate | Oaks Corp LLC</title>
+<script>
+/* =====================================================================
+   PRICE CONFIG — EXAMPLE PLACEHOLDER PRICES ONLY.
+   These are NOT real Oaks Corp prices. Brett: replace every number below
+   with your own. All amounts are US dollars, given as [low, high].
+   ===================================================================== */
+const PRICES = {
+  removal: {              // per tree (EXAMPLE placeholders)
+    small:  [300, 700],   // under 30 ft
+    medium: [700, 1500],  // 30–60 ft
+    large:  [1500, 3500]  // over 60 ft
+  },
+  trimming: {             // per tree (EXAMPLE placeholders)
+    small:  [150, 400],
+    medium: [400, 900],
+    large:  [900, 2000]
+  },
+  stump: {                // stump grinding (EXAMPLE placeholders)
+    perInchDiameter: [3, 5],  // $ per inch of diameter, per stump
+    minimumPerStump: [100, 150],
+    tripMinimum:     [150, 200] // minimum charge for a stump-only job
+  },
+  // Percent added to a tree's price (0.25 = +25%) — EXAMPLE placeholders
+  proximity: { none: 0, house: 0.25, powerlines: 0.50 },
+  access:    { easy: 0, tight: 0.20, noequip: 0.40 },
+  // Cleanup/haul-away, percent added to a tree's price — EXAMPLE placeholder
+  haulAway: 0.20
+};
+</script>
+<style>
+:root{--g:#2f5d34;--gl:#e7f0e3;--b:#6b4a2b;--bl:#f5efe6;--t:#23241f}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bl);color:var(--t);font-size:18px;line-height:1.4}
+header{background:var(--g);color:#fff;padding:20px 16px;text-align:center}
+header h1{margin:0;font-size:26px}header p{margin:6px 0 0;opacity:.9}
+main{max-width:640px;margin:0 auto;padding:16px}
+.card{background:#fff;border-radius:14px;padding:16px;margin:0 0 16px;box-shadow:0 2px 6px rgba(0,0,0,.08);border-top:5px solid var(--b)}
+h2{margin:0 0 10px;font-size:21px;color:var(--b)}
+label{display:block;font-weight:600;margin:12px 0 6px}
+select,input,textarea{width:100%;font-size:18px;padding:12px;border:2px solid #c9bfae;border-radius:10px;background:#fff}
+.btn{display:block;width:100%;padding:16px;font-size:20px;font-weight:700;border:0;border-radius:12px;background:var(--g);color:#fff;margin-top:12px;cursor:pointer}
+.btn.alt{background:var(--b)}.btn.ghost{background:var(--gl);color:var(--g)}
+.chk{display:flex;gap:10px;align-items:center;font-weight:600;margin-top:12px}.chk input{width:26px;height:26px}
+.tree{background:var(--gl);border-radius:10px;padding:12px;margin-top:12px}
+.tree h3{margin:0;font-size:18px;display:flex;justify-content:space-between}
+.tree h3 button{background:none;border:0;color:#a33;font-size:16px;cursor:pointer}
+.svc{display:grid;grid-template-columns:1fr;gap:10px}
+.svc label{margin:0;display:flex;gap:12px;align-items:center;padding:14px;border:2px solid #c9bfae;border-radius:12px;background:#fff}
+.svc input{width:26px;height:26px}
+#result{text-align:center;background:var(--g);color:#fff;border-top-color:var(--b)}
+#result .range{font-size:34px;font-weight:800;margin:8px 0}
+.note{font-size:15px;opacity:.9}.hide{display:none}
+footer{text-align:center;font-size:14px;color:#666;padding:20px}
+</style>
+</head>
+<body>
+<header><h1>🌲 Oaks Corp LLC</h1><p>Free online tree service estimate — Tenino &amp; nearby</p></header>
+<main>
+<div class="card"><h2>1. What do you need?</h2>
+<div class="svc">
+<label><input type="checkbox" id="svcRemoval"> Tree removal</label>
+<label><input type="checkbox" id="svcTrim"> Tree trimming</label>
+<label><input type="checkbox" id="svcStump"> Stump grinding</label>
+</div></div>
+
+<div class="card hide" id="removalCard"><h2>Tree removal</h2><div id="removalList"></div>
+<button class="btn ghost" onclick="addTree('removal')">+ Add another tree</button></div>
+<div class="card hide" id="trimCard"><h2>Tree trimming</h2><div id="trimList"></div>
+<button class="btn ghost" onclick="addTree('trimming')">+ Add another tree</button></div>
+<div class="card hide" id="stumpCard"><h2>Stump grinding</h2>
+<label for="stumpCount">How many stumps?</label><input type="number" id="stumpCount" min="1" value="1" inputmode="numeric">
+<label for="stumpDia">About how wide is the average stump? (inches across)</label><input type="number" id="stumpDia" min="1" value="18" inputmode="numeric"></div>
+
+<button class="btn" id="calcBtn" onclick="calc()">See my estimate</button>
+
+<div class="card hide" id="result"><div>Your estimated price range</div><div class="range" id="range"></div>
+<div class="note"><b>This is an estimate only.</b> Final price is confirmed after an on-site look at your trees.</div></div>
+
+<div class="card hide" id="leadCard"><h2>2. Get your exact quote</h2>
+<p>Leave your info and we'll reach out to set up a free on-site look.</p>
+<form id="leadForm">
+<label for="name">Name *</label><input id="name" required autocomplete="name">
+<label for="phone">Phone *</label><input id="phone" type="tel" required autocomplete="tel">
+<label for="email">Email (optional)</label><input id="email" type="email" autocomplete="email">
+<label for="addr">Job address or city (optional)</label><input id="addr" autocomplete="street-address">
+<label for="notes">Notes (optional)</label><textarea id="notes" rows="3" placeholder="Anything we should know?"></textarea>
+<label for="photos">Photos of the trees (optional)</label><input id="photos" type="file" accept="image/*" multiple>
+<button class="btn alt" type="submit">Send my request</button></form></div>
+
+<div class="card hide" id="thanks"><h2>Thank you! 🌳</h2><p>We got your request and will call you soon to confirm your estimate.</p></div>
+</main>
+<footer>Oaks Corp LLC · Tree removal · Trimming · Stump grinding</footer>
+<script>
+const $=id=>document.getElementById(id);let n=0;
+function treeHTML(type){const id='t'+(++n);return `<div class="tree" data-type="${type}" id="${id}">
+<h3>Tree <button type="button" onclick="this.closest('.tree').remove()">Remove</button></h3>
+<label>Size</label><select class="size"><option value="small">Small (under 30 ft)</option><option value="medium">Medium (30–60 ft)</option><option value="large">Large (over 60 ft)</option></select>
+<label>Is it close to anything?</label><select class="prox"><option value="none">Open area, nothing close</option><option value="house">Near a house, shed, or fence</option><option value="powerlines">Near power lines</option></select>
+<label>How easy is it to get to?</label><select class="access"><option value="easy">Easy — truck can get close</option><option value="tight">Backyard / tight space</option><option value="noequip">No equipment access</option></select>
+<label class="chk"><input type="checkbox" class="haul" checked> Clean up &amp; haul away debris</label></div>`}
+function addTree(type){$(type==='removal'?'removalList':'trimList').insertAdjacentHTML('beforeend',treeHTML(type))}
+function toggle(chk,card,list,type){$(chk).onchange=e=>{$(card).classList.toggle('hide',!e.target.checked);if(list&&e.target.checked&&!$(list).children.length)addTree(type)}}
+toggle('svcRemoval','removalCard','removalList','removal');toggle('svcTrim','trimCard','trimList','trimming');toggle('svcStump','stumpCard');
+const fmt=v=>'$'+(Math.round(v/10)*10).toLocaleString();
+function calc(){let lo=0,hi=0,any=false;
+ document.querySelectorAll('.tree').forEach(t=>{if(t.closest('.card').classList.contains('hide'))return;any=true;
+  const b=PRICES[t.dataset.type][t.querySelector('.size').value];
+  const m=1+PRICES.proximity[t.querySelector('.prox').value]+PRICES.access[t.querySelector('.access').value]+(t.querySelector('.haul').checked?PRICES.haulAway:0);
+  lo+=b[0]*m;hi+=b[1]*m});
+ if($('svcStump').checked){any=true;const c=Math.max(1,+$('stumpCount').value||1),d=Math.max(1,+$('stumpDia').value||1),s=PRICES.stump;
+  let sl=c*Math.max(s.minimumPerStump[0],d*s.perInchDiameter[0]),sh=c*Math.max(s.minimumPerStump[1],d*s.perInchDiameter[1]);
+  if(lo===0){sl=Math.max(sl,s.tripMinimum[0]);sh=Math.max(sh,s.tripMinimum[1])}lo+=sl;hi+=sh}
+ if(!any){alert('Please pick at least one service above.');return}
+ $('range').textContent=fmt(lo)+' – '+fmt(hi);$('result').classList.remove('hide');$('leadCard').classList.remove('hide');$('result').scrollIntoView({behavior:'smooth'})}
+$('leadForm').onsubmit=e=>{e.preventDefault();
+ const lead={name:$('name').value,phone:$('phone').value,email:$('email').value,address:$('addr').value,notes:$('notes').value,estimate:$('range').textContent,photos:$('photos').files.length};
+ // TODO: send `lead` somewhere (e.g. Formspree or an email service). Nothing is stored or sent right now.
+ console.log('Lead (not sent yet):',lead);
+ $('leadCard').classList.add('hide');$('thanks').classList.remove('hide');$('thanks').scrollIntoView({behavior:'smooth'})};
+</script>
+</body>
+</html>
