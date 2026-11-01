@@ -30,8 +30,21 @@ const PRICES = {
     tripMinimum:     [150, 200] // minimum charge for a stump-only job
   },
   // Percent added to a tree's price (0.25 = +25%) — EXAMPLE placeholders
-  proximity: { none: 0, house: 0.25, powerlines: 0.50 },
-  access:    { easy: 0, tight: 0.20, noequip: 0.40 },
+  // What the tree is near — percent added (0.25 = +25%). EXAMPLE placeholders.
+  // If several are picked: the LARGEST one counts in full, plus
+  // `extraHazardEach` for every additional one picked.
+  nearHazards: { powerlines: 0.50, house: 0.25, fence: 0.15, road: 0.15 },
+  extraHazardEach: 0.10,
+  // Access width — percent added. EXAMPLE placeholders.
+  access: {
+    wide:   0,     // Wide open, 10 ft+ (trucks/equipment drive up)
+    gate:   0.10,  // Gate or path 6–10 ft (skid steer)
+    narrow: 0.25,  // Narrow 3–6 ft (mini equipment / hand carry)
+    none:   0.45   // Under 3 ft or none (hand carry / crane)
+  },
+  // Septic tank / drain field — percent added if YES. EXAMPLE placeholders.
+  // Both can apply (they add together).
+  septic: { path: 0.15, near: 0.10 },
   // Cleanup/haul-away, percent added to a tree's price — EXAMPLE placeholder
   haulAway: 0.20
 };
@@ -115,6 +128,15 @@ input:focus,textarea:focus{outline:0;border-color:var(--g2);box-shadow:0 0 0 4px
 .done{text-align:center;padding:34px 20px}.done .big{width:84px;height:84px;margin:0 auto 12px;border-radius:50%;background:var(--gl);display:grid;place-items:center;color:var(--g2)}.done .big svg{width:46px;height:46px}
 footer{text-align:center;font-size:13px;color:#8a8579;padding:10px 0 30px}
 .xtra{display:flex;gap:10px;align-items:center;background:#f4ebdf;border:1px solid #e6d6bf;color:#5b3d22;border-radius:14px;padding:12px 14px;font-size:14.5px;margin:0 0 14px}.xtra svg{flex:0 0 22px;width:22px;height:22px;color:var(--b2)}
+.multi{display:grid;grid-template-columns:1fr 1fr;gap:8px}.multi button{font:600 14px/1.25 Inter,sans-serif;padding:12px 8px;border:2px solid #e3ddd1;border-radius:12px;background:#fff;color:var(--t);cursor:pointer;transition:all .2s;text-align:left;display:flex;gap:8px;align-items:center}
+.multi button:before{content:"";flex:0 0 18px;height:18px;border-radius:5px;border:2px solid #cfc8ba;background:#fff center/12px no-repeat}
+.multi button.sel{border-color:var(--g2);background:#f1f8ee}.multi button.sel:before{background-color:var(--g2);border-color:var(--g2);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5' fill='none' stroke='white' stroke-width='3.5'/%3E%3C/svg%3E")}
+.multi .full{grid-column:1/-1}.hint{font-size:12.5px;color:var(--mut);font-weight:500;margin-left:4px}
+.acc{display:grid;gap:8px}.acc button{font:600 14.5px/1.3 Inter,sans-serif;padding:12px 14px;border:2px solid #e3ddd1;border-radius:12px;background:#fff;color:var(--t);cursor:pointer;text-align:left;transition:all .2s}
+.acc button small{display:block;font-weight:500;color:var(--mut);font-size:12.5px}.acc button.sel{border-color:var(--g2);background:var(--g2);color:#fff}.acc button.sel small{color:#dfeedd}
+.gw{display:flex;align-items:center;gap:10px;margin-top:10px}.gw span{font-size:14px;font-weight:600;flex:1}.gw input{width:110px;padding:10px}
+.snote{display:flex;gap:8px;text-align:left;background:rgba(255,255,255,.12);border-radius:12px;padding:10px 12px;font-size:13.5px;margin-top:12px}
+.lines .sub2{display:block;font-size:12.5px;color:var(--mut);font-weight:400;margin-top:2px;white-space:normal}
 </style>
 </head>
 <body>
@@ -181,7 +203,8 @@ footer{text-align:center;font-size:13px;color:#8a8579;padding:10px 0 30px}
 <section class="step" data-step="4">
 <div class="est"><div class="lbl">Your estimated price range</div><div class="range" id="range"></div>
 <div class="disc"><svg width="15" height="15"><use href="#i-info"/></svg>Estimate only, confirmed on-site</div>
-<div class="lines" id="lines"></div></div>
+<div class="lines" id="lines"></div>
+<div class="snote" id="septicNote" style="display:none"><svg width="18" height="18" style="flex:0 0 18px"><use href="#i-info"/></svg><span>Septic tanks and drain fields need careful equipment planning. We'll confirm how to protect them during the on-site visit.</span></div></div>
 <p class="fine">This is a rough estimate based on your answers. Your final price is confirmed after we look at the trees in person.</p>
 <div class="xtra"><svg><use href="#i-leaf"/></svg><span><b>We also do land clearing &amp; excavation.</b> Ask us about it when we call.</span></div>
 <div class="nav"><button class="btn back" onclick="go(3)">←</button><button class="btn brown" onclick="go(5)">Get my exact quote →</button></div></section>
@@ -227,10 +250,19 @@ function seg(cls,opts){return `<div class="seg" data-k="${cls}">${opts.map((o,i)
 function addTree(type){const list=$(type==='removal'?'removalList':'trimList');const el=document.createElement('div');el.className='tree';el.dataset.type=type;
  el.innerHTML=`<div class="tree-h"><h3>Tree ${list.children.length+1}</h3><button class="x" type="button">Remove</button></div>
  <span class="fl">Size</span>${seg('size',[['small','Small','under 30 ft'],['medium','Medium','30–60 ft'],['large','Large','60 ft +']])}
- <span class="fl">Is it close to anything?</span>${seg('prox',[['none','Open','nothing close'],['house','Near house','shed / fence'],['powerlines','Power lines','nearby']])}
- <span class="fl">How easy is it to reach?</span>${seg('access',[['easy','Easy','truck access'],['tight','Tight','backyard'],['noequip','No access','for equipment']])}
+ <span class="fl">What is it near? <span class="hint">Pick all that apply</span></span>
+ <div class="multi" data-k="near"><button type="button" data-v="powerlines">Power lines</button><button type="button" data-v="house">House / structure</button><button type="button" data-v="fence">Fence / shed</button><button type="button" data-v="road">Road / driveway</button><button type="button" data-v="open" data-x="1" class="full sel">Open area, nothing nearby</button></div>
+ <span class="fl">How wide is the way in to the tree?</span>
+ <div class="acc" data-k="access"><button type="button" data-v="wide" class="sel">Wide open, 10 ft+<small>Trucks / equipment drive up</small></button><button type="button" data-v="gate">Gate or path 6–10 ft<small>Skid steer</small></button><button type="button" data-v="narrow">Narrow 3–6 ft<small>Mini equipment / hand carry</small></button><button type="button" data-v="none">Under 3 ft or none<small>Hand carry / crane</small></button></div>
+ <div class="gw"><span>Gate width if known (ft)</span><input type="number" class="gwidth" min="0" step="0.5" inputmode="decimal" placeholder="optional"></div>
+ <span class="fl">Is there a septic tank or drain field in the access path or near the tree?</span>
+ <div class="multi" data-k="septic"><button type="button" data-v="no" data-x="1" class="sel">No</button><button type="button" data-v="unsure" data-x="1">Not sure</button><button type="button" data-v="path">Yes, in the access path</button><button type="button" data-v="near">Yes, near the tree</button></div>
  <label class="tog"><input type="checkbox" class="haul" checked><i></i>Clean up &amp; haul away debris</label>`;
  el.querySelector('.x').onclick=()=>{el.remove();[...list.children].forEach((t,i)=>t.querySelector('h3').textContent='Tree '+(i+1))};
+ el.querySelectorAll('.multi').forEach(g=>g.onclick=e=>{const b=e.target.closest('button');if(!b)return;
+  if(b.dataset.x){g.querySelectorAll('button').forEach(x=>x.classList.toggle('sel',x===b))}else{b.classList.toggle('sel');g.querySelectorAll('[data-x]').forEach(x=>x.classList.remove('sel'));
+  if(!g.querySelector('.sel'))g.querySelector('[data-x]').classList.add('sel')}});
+ el.querySelectorAll('.acc').forEach(g=>g.onclick=e=>{const b=e.target.closest('button');if(!b)return;g.querySelectorAll('button').forEach(x=>x.classList.toggle('sel',x===b))});
  el.querySelectorAll('.seg').forEach(g=>g.onclick=e=>{const b=e.target.closest('button');if(!b)return;g.querySelectorAll('button').forEach(x=>x.classList.toggle('sel',x===b))});
  list.appendChild(el)}
 function bump(id,d){const i=$(id);i.value=Math.max(1,(+i.value||0)+d)}
@@ -243,17 +275,29 @@ renderThumbs();
 let when='';document.querySelectorAll('.wopt').forEach(o=>o.onclick=()=>{document.querySelectorAll('.wopt').forEach(x=>x.classList.toggle('sel',x===o));when=o.dataset.v;$('emNote').style.display=when.startsWith('ASAP')?'flex':'none'});
 const fmt=v=>'$'+(Math.round(v/10)*10).toLocaleString();const val=(t,k)=>t.querySelector(`.seg[data-k="${k}"] .sel`).dataset.v;
 const NAMES={removal:'Removal',trimming:'Trimming',small:'small',medium:'medium',large:'large'};
-function calc(){let lo=0,hi=0;const lines=[];
+const LBL={powerlines:'power lines',house:'house/structure',fence:'fence/shed',road:'road/driveway',open:'open area',wide:'wide open 10 ft+',gate:'gate/path 6–10 ft',narrow:'narrow 3–6 ft',none:'under 3 ft / none',no:'no',unsure:'not sure',path:'in access path',near:'near tree'};
+const multi=(t,k)=>[...t.querySelectorAll(`.multi[data-k="${k}"] .sel`)].map(b=>b.dataset.v);
+let treeInfo=[],septicFlag=false;
+function calc(){let lo=0,hi=0;const lines=[];treeInfo=[];septicFlag=false;
  document.querySelectorAll('.tree').forEach(t=>{if(!sel.has(t.dataset.type))return;const b=PRICES[t.dataset.type][val(t,'size')];
-  const m=1+PRICES.proximity[val(t,'prox')]+PRICES.access[val(t,'access')]+(t.querySelector('.haul').checked?PRICES.haulAway:0);
-  lo+=b[0]*m;hi+=b[1]*m;lines.push([`${NAMES[t.dataset.type]} · ${t.querySelector('h3').textContent.toLowerCase()} (${val(t,'size')})`,fmt(b[0]*m)+'–'+fmt(b[1]*m)])});
+  const near=multi(t,'near').filter(v=>v!=='open'),hz=near.map(v=>PRICES.nearHazards[v]).sort((a,b)=>b-a);
+  const hazAdd=hz.length?hz[0]+PRICES.extraHazardEach*(hz.length-1):0;
+  const acc=t.querySelector('.acc .sel').dataset.v,sep=multi(t,'septic'),sepAdd=sep.reduce((a,v)=>a+(PRICES.septic[v]||0),0);
+  if(sep.includes('path')||sep.includes('near'))septicFlag=true;
+  const gw=t.querySelector('.gwidth').value,haul=t.querySelector('.haul').checked;
+  const m=1+hazAdd+PRICES.access[acc]+sepAdd+(haul?PRICES.haulAway:0);
+  const name=`${NAMES[t.dataset.type]} · ${t.querySelector('h3').textContent.toLowerCase()} (${val(t,'size')})`;
+  const det=`Near: ${(near.length?near:['open']).map(v=>LBL[v]).join(', ')} · Access: ${LBL[acc]}${gw?` (gate ${gw} ft)`:''} · Septic/drain field: ${sep.map(v=>LBL[v]).join(' + ')}${haul?' · Haul-away':''}`;
+  treeInfo.push({service:t.dataset.type,size:val(t,'size'),near:near.length?near:['open'],access:acc,gateWidthFt:gw||null,septic:sep,haulAway:haul,range:fmt(b[0]*m)+'–'+fmt(b[1]*m)});
+  lo+=b[0]*m;hi+=b[1]*m;lines.push([name+`<span class="sub2">${det}</span>`,fmt(b[0]*m)+'–'+fmt(b[1]*m)])});
  if(sel.has('stump')){const c=Math.max(1,+$('stumpCount').value||1),d=Math.max(1,+$('stumpDia').value||1),s=PRICES.stump;
   let sl=c*Math.max(s.minimumPerStump[0],d*s.perInchDiameter[0]),sh=c*Math.max(s.minimumPerStump[1],d*s.perInchDiameter[1]);
   if(lo===0){sl=Math.max(sl,s.tripMinimum[0]);sh=Math.max(sh,s.tripMinimum[1])}lo+=sl;hi+=sh;lines.push([`Stump grinding · ${c} × ${d}"`,fmt(sl)+'–'+fmt(sh)])}
  if(photos.length)lines.push(['Photos attached',photos.length]);
+ $('septicNote').style.display=septicFlag?'flex':'none';
  $('range').textContent=fmt(lo)+' – '+fmt(hi);$('lines').innerHTML=lines.map(l=>`<div><span>${l[0]}</span><span>${l[1]}</span></div>`).join('')}
 $('leadForm').onsubmit=e=>{e.preventDefault();if(!$('name').value.trim()||!$('phone').value.trim()){$('err5').style.display='block';return}
- const lead={name:$('name').value,phone:$('phone').value,email:$('email').value,address:$('addr').value,notes:$('notes').value,services:[...sel],estimate:$('range').textContent,timeline:when,preferredDate:$('pdate').value,landClearingInterest:$('landX').checked,photos:photos.map(p=>p.file)};
+ const lead={name:$('name').value,phone:$('phone').value,email:$('email').value,address:$('addr').value,notes:$('notes').value,services:[...sel],trees:treeInfo,septicOrDrainField:septicFlag,stumps:sel.has('stump')?{count:$('stumpCount').value,diameterIn:$('stumpDia').value}:null,estimate:$('range').textContent,timeline:when,preferredDate:$('pdate').value,landClearingInterest:$('landX').checked,photos:photos.map(p=>p.file)};
  // TODO: send `lead` to a backend (e.g. Formspree or an email service). Build a FormData, append each
  // photo with fd.append('photos', file), then fetch(ENDPOINT,{method:'POST',body:fd}).
  // Right now nothing is stored or sent anywhere.
