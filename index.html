@@ -187,6 +187,15 @@ footer{text-align:center;font-size:13px;color:#8a8579;padding:10px 0 30px}
 <section class="step" data-step="5"><div class="card">
 <p class="step-lbl">Step 5 of 5</p><h2>Where should we reach you?</h2><p class="sub">We'll contact you to confirm your estimate.</p>
 <form id="leadForm" novalidate>
+<span class="fl">When would you like the work done?</span>
+<div class="opts" id="when">
+<div class="opt wopt" data-v="ASAP / emergency"><div><b>ASAP / emergency</b><small>Tree down or hazard</small></div><div class="ck"><svg><use href="#i-check"/></svg></div></div>
+<div class="opt wopt" data-v="Within 2 weeks"><div><b>Within 2 weeks</b></div><div class="ck"><svg><use href="#i-check"/></svg></div></div>
+<div class="opt wopt" data-v="Within 1-2 months"><div><b>Within 1–2 months</b></div><div class="ck"><svg><use href="#i-check"/></svg></div></div>
+<div class="opt wopt" data-v="Flexible / just getting a price"><div><b>Flexible</b><small>Just getting a price</small></div><div class="ck"><svg><use href="#i-check"/></svg></div></div>
+</div>
+<div class="tip" id="emNote" style="display:none"><svg><use href="#i-info"/></svg><span>Emergency rates may apply. We'll confirm when we call you.</span></div>
+<span class="fl">Preferred date (optional)</span><input id="pdate" type="date">
 <span class="fl">Name <span class="req">*</span></span><input id="name" autocomplete="name">
 <span class="fl">Phone <span class="req">*</span></span><input id="phone" type="tel" autocomplete="tel" inputmode="tel">
 <span class="fl">Email (optional)</span><input id="email" type="email" autocomplete="email">
@@ -204,7 +213,7 @@ footer{text-align:center;font-size:13px;color:#8a8579;padding:10px 0 30px}
 
 <script>
 const $=id=>document.getElementById(id);const sel=new Set();let cur=1;const photos=[];
-document.querySelectorAll('.opt').forEach(o=>o.onclick=()=>{o.classList.toggle('sel');const s=o.dataset.svc;sel.has(s)?sel.delete(s):sel.add(s);$('err1').style.display='none'});
+document.querySelectorAll('.opt:not(.wopt)').forEach(o=>o.onclick=()=>{o.classList.toggle('sel');const s=o.dataset.svc;sel.has(s)?sel.delete(s):sel.add(s);$('err1').style.display='none'});
 function go(n){cur=n;document.querySelectorAll('.step').forEach(s=>s.classList.toggle('active',+s.dataset.step===n));
  $('bar').style.width=Math.min(n,5)*20+'%';[...$('dots').children].forEach((d,i)=>{d.className=i+1<n?'on':i+1===n?'cur':''});window.scrollTo({top:0,behavior:'smooth'})}
 function next1(){if(!sel.size){$('err1').style.display='block';return}
@@ -227,6 +236,7 @@ function renderThumbs(){$('thumbs').innerHTML='';photos.forEach((p,i)=>{const d=
  d.querySelector('button').onclick=()=>{URL.revokeObjectURL(p.url);photos.splice(i,1);renderThumbs()};$('thumbs').appendChild(d)});
  $('pcount').textContent=photos.length?`${photos.length} photo${photos.length>1?'s':''} added ✓`:'';$('photoNext').innerHTML=photos.length?'See my estimate →':'Skip photos & see estimate →'}
 renderThumbs();
+let when='';document.querySelectorAll('.wopt').forEach(o=>o.onclick=()=>{document.querySelectorAll('.wopt').forEach(x=>x.classList.toggle('sel',x===o));when=o.dataset.v;$('emNote').style.display=when.startsWith('ASAP')?'flex':'none'});
 const fmt=v=>'$'+(Math.round(v/10)*10).toLocaleString();const val=(t,k)=>t.querySelector(`.seg[data-k="${k}"] .sel`).dataset.v;
 const NAMES={removal:'Removal',trimming:'Trimming',small:'small',medium:'medium',large:'large'};
 function calc(){let lo=0,hi=0;const lines=[];
@@ -239,7 +249,7 @@ function calc(){let lo=0,hi=0;const lines=[];
  if(photos.length)lines.push(['Photos attached',photos.length]);
  $('range').textContent=fmt(lo)+' – '+fmt(hi);$('lines').innerHTML=lines.map(l=>`<div><span>${l[0]}</span><span>${l[1]}</span></div>`).join('')}
 $('leadForm').onsubmit=e=>{e.preventDefault();if(!$('name').value.trim()||!$('phone').value.trim()){$('err5').style.display='block';return}
- const lead={name:$('name').value,phone:$('phone').value,email:$('email').value,address:$('addr').value,notes:$('notes').value,services:[...sel],estimate:$('range').textContent,photos:photos.map(p=>p.file)};
+ const lead={name:$('name').value,phone:$('phone').value,email:$('email').value,address:$('addr').value,notes:$('notes').value,services:[...sel],estimate:$('range').textContent,timeline:when,preferredDate:$('pdate').value,photos:photos.map(p=>p.file)};
  // TODO: send `lead` to a backend (e.g. Formspree or an email service). Build a FormData, append each
  // photo with fd.append('photos', file), then fetch(ENDPOINT,{method:'POST',body:fd}).
  // Right now nothing is stored or sent anywhere.
