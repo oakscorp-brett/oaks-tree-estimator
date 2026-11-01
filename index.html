@@ -2,8 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1f3d24">
 <title>Free Tree Service Estimate | Oaks Corp LLC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <script>
 /* =====================================================================
    PRICE CONFIG — EXAMPLE PLACEHOLDER PRICES ONLY.
@@ -34,96 +37,213 @@ const PRICES = {
 };
 </script>
 <style>
-:root{--g:#2f5d34;--gl:#e7f0e3;--b:#6b4a2b;--bl:#f5efe6;--t:#23241f}
-*{box-sizing:border-box}
-body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bl);color:var(--t);font-size:18px;line-height:1.4}
-header{background:var(--g);color:#fff;padding:20px 16px;text-align:center}
-header .logo{display:block;width:170px;max-width:50%;height:auto;margin:0 auto 8px}
-header h1{margin:0;font-size:26px}header p{margin:6px 0 0;opacity:.9}
-main{max-width:640px;margin:0 auto;padding:16px}
-.card{background:#fff;border-radius:14px;padding:16px;margin:0 0 16px;box-shadow:0 2px 6px rgba(0,0,0,.08);border-top:5px solid var(--b)}
-h2{margin:0 0 10px;font-size:21px;color:var(--b)}
-label{display:block;font-weight:600;margin:12px 0 6px}
-select,input,textarea{width:100%;font-size:18px;padding:12px;border:2px solid #c9bfae;border-radius:10px;background:#fff}
-.btn{display:block;width:100%;padding:16px;font-size:20px;font-weight:700;border:0;border-radius:12px;background:var(--g);color:#fff;margin-top:12px;cursor:pointer}
-.btn.alt{background:var(--b)}.btn.ghost{background:var(--gl);color:var(--g)}
-.chk{display:flex;gap:10px;align-items:center;font-weight:600;margin-top:12px}.chk input{width:26px;height:26px}
-.tree{background:var(--gl);border-radius:10px;padding:12px;margin-top:12px}
-.tree h3{margin:0;font-size:18px;display:flex;justify-content:space-between}
-.tree h3 button{background:none;border:0;color:#a33;font-size:16px;cursor:pointer}
-.svc{display:grid;grid-template-columns:1fr;gap:10px}
-.svc label{margin:0;display:flex;gap:12px;align-items:center;padding:14px;border:2px solid #c9bfae;border-radius:12px;background:#fff}
-.svc input{width:26px;height:26px}
-#result{text-align:center;background:var(--g);color:#fff;border-top-color:var(--b)}
-#result .range{font-size:34px;font-weight:800;margin:8px 0}
-.note{font-size:15px;opacity:.9}.hide{display:none}
-footer{text-align:center;font-size:14px;color:#666;padding:20px}
+:root{--g:#1f3d24;--g2:#2f6b3a;--gl:#eaf3e6;--b:#7a5230;--b2:#a8743f;--cream:#f7f3ec;--t:#1d211c;--mut:#5d6458;--r:18px;--sh:0 10px 30px rgba(31,61,36,.12),0 2px 6px rgba(0,0,0,.05)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--cream);color:var(--t);font-size:17px;line-height:1.5}
+h1,h2,h3,.btn,.step-lbl,.range{font-family:Montserrat,system-ui,sans-serif}
+header{background:radial-gradient(120% 90% at 50% 0%,#2f6b3a 0%,#1f3d24 70%);color:#fff;text-align:center;padding:22px 18px 54px;position:relative}
+header .logo{display:block;width:150px;max-width:46%;height:auto;margin:0 auto 6px;filter:drop-shadow(0 6px 14px rgba(0,0,0,.35))}
+header h1{margin:4px 0 2px;font-size:25px;font-weight:800;letter-spacing:.2px}
+header p{margin:0;opacity:.88;font-size:15px}
+.badges{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:14px}
+.badge{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);padding:6px 11px;border-radius:999px;font-size:13px;font-weight:600}
+.badge svg{width:15px;height:15px}
+main{max-width:620px;margin:-36px auto 0;padding:0 14px 30px;position:relative}
+.progress{background:#fff;border-radius:var(--r);box-shadow:var(--sh);padding:14px 14px 10px;margin-bottom:14px}
+.bar{height:8px;background:#e6e1d7;border-radius:99px;overflow:hidden}.bar i{display:block;height:100%;width:20%;background:linear-gradient(90deg,var(--g2),var(--b2));border-radius:99px;transition:width .45s cubic-bezier(.4,0,.2,1)}
+.dots{display:flex;justify-content:space-between;margin-top:9px}
+.dots span{font-size:11.5px;font-weight:600;color:#a39e93;text-align:center;flex:1}.dots span.on{color:var(--g2)}.dots span.cur{color:var(--g)}
+.step{display:none;animation:in .38s cubic-bezier(.4,0,.2,1)}.step.active{display:block}
+@keyframes in{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.card{background:#fff;border-radius:var(--r);box-shadow:var(--sh);padding:22px 18px;margin-bottom:14px}
+.step-lbl{font-size:12px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--b2);margin:0 0 4px}
+h2{margin:0 0 6px;font-size:23px;font-weight:800;color:var(--g)}
+.sub{color:var(--mut);margin:0 0 16px;font-size:15.5px}
+.opts{display:grid;gap:12px}
+.opt{display:flex;align-items:center;gap:14px;padding:16px;border:2px solid #e3ddd1;border-radius:16px;background:#fff;cursor:pointer;transition:all .2s;position:relative;user-select:none}
+.opt:active{transform:scale(.985)}
+.opt .ic{flex:0 0 54px;height:54px;border-radius:14px;background:var(--gl);display:grid;place-items:center;color:var(--g2);transition:all .2s}
+.opt .ic svg{width:32px;height:32px}
+.opt b{display:block;font-family:Montserrat,sans-serif;font-size:17px}.opt small{color:var(--mut);font-size:14px}
+.opt .ck{margin-left:auto;width:26px;height:26px;border-radius:50%;border:2px solid #cfc8ba;display:grid;place-items:center;transition:all .2s;flex:0 0 26px}
+.opt .ck svg{width:15px;height:15px;opacity:0;color:#fff}
+.opt.sel{border-color:var(--g2);background:#f6faf3;box-shadow:0 6px 18px rgba(47,107,58,.15)}
+.opt.sel .ic{background:var(--g2);color:#fff}.opt.sel .ck{background:var(--g2);border-color:var(--g2)}.opt.sel .ck svg{opacity:1}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.seg button{font:600 14px/1.25 Inter,sans-serif;padding:12px 6px;border:2px solid #e3ddd1;border-radius:12px;background:#fff;color:var(--t);cursor:pointer;transition:all .2s}
+.seg button small{display:block;font-weight:500;color:var(--mut);font-size:12px}
+.seg button.sel{border-color:var(--g2);background:var(--g2);color:#fff}.seg button.sel small{color:#dfeedd}
+.tree{border:1px solid #ece6da;border-radius:16px;padding:16px;margin-top:14px;background:#fcfbf8;animation:in .3s}
+.tree-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.tree-h h3{margin:0;font-size:16px;color:var(--b)}
+.x{border:0;background:#f3e9e4;color:#9b3b2a;font:600 13px Inter;padding:6px 10px;border-radius:99px;cursor:pointer}
+.fl{font-weight:600;font-size:14.5px;margin:14px 0 7px;display:block}
+.tog{display:flex;align-items:center;gap:12px;margin-top:14px;font-weight:600;font-size:15px;cursor:pointer}
+.tog input{display:none}.tog i{width:48px;height:28px;border-radius:99px;background:#d6d0c4;position:relative;transition:.2s;flex:0 0 48px}
+.tog i:after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:.2s}
+.tog input:checked+i{background:var(--g2)}.tog input:checked+i:after{left:23px}
+.sec-h{display:flex;align-items:center;gap:10px;margin:6px 0 2px}.sec-h svg{width:26px;height:26px;color:var(--g2)}.sec-h h3{margin:0;font-size:18px;color:var(--g)}
+.stepper{display:flex;align-items:center;border:2px solid #e3ddd1;border-radius:14px;overflow:hidden;background:#fff}
+.stepper button{width:56px;height:52px;border:0;background:var(--gl);font-size:24px;color:var(--g);cursor:pointer;font-weight:700}
+.stepper input{flex:1;border:0;text-align:center;font:700 20px Montserrat;min-width:0;height:52px}
+input,textarea{width:100%;font:16.5px Inter,sans-serif;padding:14px;border:2px solid #e3ddd1;border-radius:14px;background:#fff;transition:border .2s,box-shadow .2s}
+input:focus,textarea:focus{outline:0;border-color:var(--g2);box-shadow:0 0 0 4px rgba(47,107,58,.12)}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:17px;font-size:17px;font-weight:700;border:0;border-radius:16px;background:linear-gradient(180deg,#357a42,#26582f);color:#fff;cursor:pointer;box-shadow:0 8px 20px rgba(38,88,47,.3);transition:transform .15s,box-shadow .15s}
+.btn:active{transform:translateY(1px);box-shadow:0 4px 10px rgba(38,88,47,.3)}
+.btn.brown{background:linear-gradient(180deg,#9a6a3a,#7a5230);box-shadow:0 8px 20px rgba(122,82,48,.3)}
+.btn.ghost{background:var(--gl);color:var(--g);box-shadow:none;margin-top:14px}
+.nav{display:flex;gap:10px;margin-top:6px}.nav .back{flex:0 0 auto;width:auto;padding:17px 20px;background:#fff;color:var(--g);box-shadow:var(--sh)}
+.drop{border:2.5px dashed #c9bfa9;border-radius:18px;padding:26px 16px;text-align:center;background:#fdfbf7}
+.drop svg{width:52px;height:52px;color:var(--b2)}.drop p{margin:6px 0 14px;color:var(--mut);font-size:15px}
+.pbtns{display:grid;grid-template-columns:1fr 1fr;gap:10px}.pbtns .btn{padding:16px 8px;min-width:0}.drop .pbtns svg{width:22px;height:22px;color:#fff}
+.thumbs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}
+.th{position:relative;aspect-ratio:1;border-radius:14px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,.12);animation:in .3s}
+.th img{width:100%;height:100%;object-fit:cover}
+.th button{position:absolute;top:6px;right:6px;width:30px;height:30px;border-radius:50%;border:0;background:rgba(0,0,0,.65);color:#fff;font-size:18px;line-height:30px;cursor:pointer}
+.pcount{text-align:center;color:var(--g2);font-weight:600;font-size:14.5px;margin-top:12px}
+.tip{display:flex;gap:10px;background:var(--gl);border-radius:14px;padding:12px 14px;margin-top:16px;font-size:14px;color:#33503a}.tip svg{flex:0 0 20px;width:20px;height:20px}
+.est{background:radial-gradient(130% 100% at 50% 0%,#2f6b3a,#1a3520);color:#fff;text-align:center;padding:28px 20px;border-radius:var(--r);box-shadow:var(--sh);position:relative;overflow:hidden}
+.est:before{content:"";position:absolute;inset:auto -40px -60px auto;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.05)}
+.est .lbl{font-size:13px;letter-spacing:1.3px;text-transform:uppercase;opacity:.8;font-weight:600}
+.range{font-size:38px;font-weight:800;margin:6px 0 4px;letter-spacing:-.5px}
+.est .disc{display:inline-flex;gap:6px;align-items:center;background:rgba(255,255,255,.12);padding:7px 12px;border-radius:99px;font-size:13px;font-weight:600;margin-top:6px}
+.lines{background:#fff;color:var(--t);border-radius:14px;margin-top:18px;padding:6px 14px;text-align:left}
+.lines div{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid #eee;font-size:14.5px}.lines div:last-child{border:0}.lines span:last-child{font-weight:600;white-space:nowrap}
+.fine{font-size:13.5px;color:var(--mut);text-align:center;margin:14px 6px}
+.req{color:#b04a2e}
+.err{color:#b04a2e;font-size:14px;font-weight:600;margin-top:10px;display:none}
+.done{text-align:center;padding:34px 20px}.done .big{width:84px;height:84px;margin:0 auto 12px;border-radius:50%;background:var(--gl);display:grid;place-items:center;color:var(--g2)}.done .big svg{width:46px;height:46px}
+footer{text-align:center;font-size:13px;color:#8a8579;padding:10px 0 30px}
 </style>
 </head>
 <body>
-<header><img src="logo.png" alt="Oaks Corporation logo" class="logo"><h1>Oaks Corp LLC</h1><p>Free online tree service estimate — Tenino &amp; nearby</p></header>
+<svg width="0" height="0" style="position:absolute"><defs>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-saw" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M24 6l-10 14h6l-8 11h24l-8-11h6z"/><path d="M24 31v11"/><path d="M33 40l9-9M36 43l9-9" opacity=".7"/></symbol>
+<symbol id="i-trim" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="22" cy="18" r="11"/><path d="M22 29v14M22 34l-6-4M22 31l5-4"/><circle cx="37" cy="36" r="3"/><circle cx="37" cy="44" r="0"/><path d="M34.5 34l-6-6M39.5 34l3-8"/></symbol>
+<symbol id="i-stump" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="24" cy="20" rx="14" ry="5"/><path d="M10 20v12c0 3 6 5 14 5s14-2 14-5V20"/><path d="M10 32l-5 6M38 32l5 6M24 37v5"/><ellipse cx="24" cy="20" rx="6" ry="2"/></symbol>
+<symbol id="i-cam" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16h8l4-6h12l4 6h8v22H6z"/><circle cx="24" cy="26" r="7"/></symbol>
+<symbol id="i-img" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="9" width="36" height="30" rx="4"/><circle cx="17" cy="19" r="3.5"/><path d="M6 33l11-10 9 8 6-5 10 9"/></symbol>
+<symbol id="i-leaf" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c0-9 6-14 15-14 0 9-5 15-14 15"/><path d="M5 19l8-8"/></symbol>
+<symbol id="i-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.5-7-11.5a7 7 0 0114 0C19 14.5 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></symbol>
+<symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+<symbol id="i-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></symbol>
+</defs></svg>
+
+<header>
+<img src="logo.png" alt="Oaks Corporation logo" class="logo">
+<h1>Oaks Corp LLC</h1>
+<p>Get a tree service estimate in about a minute</p>
+<div class="badges">
+<span class="badge"><svg><use href="#i-pin"/></svg>Serving Tenino &amp; nearby</span>
+<span class="badge"><svg><use href="#i-check"/></svg>No obligation</span>
+<span class="badge"><svg><use href="#i-clock"/></svg>Takes ~1 minute</span>
+</div>
+</header>
+
 <main>
-<div class="card"><h2>1. What do you need?</h2>
-<div class="svc">
-<label><input type="checkbox" id="svcRemoval"> Tree removal</label>
-<label><input type="checkbox" id="svcTrim"> Tree trimming</label>
-<label><input type="checkbox" id="svcStump"> Stump grinding</label>
-</div></div>
+<div class="progress"><div class="bar"><i id="bar"></i></div>
+<div class="dots" id="dots"><span>Services</span><span>Details</span><span>Photos</span><span>Estimate</span><span>Contact</span></div></div>
 
-<div class="card hide" id="removalCard"><h2>Tree removal</h2><div id="removalList"></div>
-<button class="btn ghost" onclick="addTree('removal')">+ Add another tree</button></div>
-<div class="card hide" id="trimCard"><h2>Tree trimming</h2><div id="trimList"></div>
-<button class="btn ghost" onclick="addTree('trimming')">+ Add another tree</button></div>
-<div class="card hide" id="stumpCard"><h2>Stump grinding</h2>
-<label for="stumpCount">How many stumps?</label><input type="number" id="stumpCount" min="1" value="1" inputmode="numeric">
-<label for="stumpDia">About how wide is the average stump? (inches across)</label><input type="number" id="stumpDia" min="1" value="18" inputmode="numeric"></div>
+<!-- STEP 1: services -->
+<section class="step active" data-step="1"><div class="card">
+<p class="step-lbl">Step 1 of 5</p><h2>What do you need?</h2><p class="sub">Tap everything that applies.</p>
+<div class="opts">
+<div class="opt" data-svc="removal"><div class="ic"><svg><use href="#i-saw"/></svg></div><div><b>Tree removal</b><small>Take a tree down safely</small></div><div class="ck"><svg><use href="#i-check"/></svg></div></div>
+<div class="opt" data-svc="trimming"><div class="ic"><svg><use href="#i-trim"/></svg></div><div><b>Tree trimming</b><small>Prune, thin, or shape</small></div><div class="ck"><svg><use href="#i-check"/></svg></div></div>
+<div class="opt" data-svc="stump"><div class="ic"><svg><use href="#i-stump"/></svg></div><div><b>Stump grinding</b><small>Grind stumps below ground</small></div><div class="ck"><svg><use href="#i-check"/></svg></div></div>
+</div><div class="err" id="err1">Please pick at least one service.</div></div>
+<button class="btn" onclick="next1()">Continue →</button></section>
 
-<button class="btn" id="calcBtn" onclick="calc()">See my estimate</button>
+<!-- STEP 2: details -->
+<section class="step" data-step="2"><div class="card">
+<p class="step-lbl">Step 2 of 5</p><h2>Tell us about the job</h2><p class="sub">Your best guess is fine.</p>
+<div id="removalSec"><div class="sec-h"><svg><use href="#i-saw"/></svg><h3>Tree removal</h3></div><div id="removalList"></div><button class="btn ghost" onclick="addTree('removal')">+ Add another tree</button></div>
+<div id="trimSec"><div class="sec-h" style="margin-top:20px"><svg><use href="#i-trim"/></svg><h3>Tree trimming</h3></div><div id="trimList"></div><button class="btn ghost" onclick="addTree('trimming')">+ Add another tree</button></div>
+<div id="stumpSec"><div class="sec-h" style="margin-top:20px"><svg><use href="#i-stump"/></svg><h3>Stump grinding</h3></div>
+<span class="fl">How many stumps?</span><div class="stepper"><button onclick="bump('stumpCount',-1)">−</button><input id="stumpCount" type="number" value="1" min="1" inputmode="numeric"><button onclick="bump('stumpCount',1)">+</button></div>
+<span class="fl">About how wide is the average stump? (inches)</span><div class="stepper"><button onclick="bump('stumpDia',-2)">−</button><input id="stumpDia" type="number" value="18" min="1" inputmode="numeric"><button onclick="bump('stumpDia',2)">+</button></div></div>
+</div><div class="nav"><button class="btn back" onclick="go(1)">←</button><button class="btn" onclick="go(3)">Continue →</button></div></section>
 
-<div class="card hide" id="result"><div>Your estimated price range</div><div class="range" id="range"></div>
-<div class="note"><b>This is an estimate only.</b> Final price is confirmed after an on-site look at your trees.</div></div>
+<!-- STEP 3: photos -->
+<section class="step" data-step="3"><div class="card">
+<p class="step-lbl">Step 3 of 5</p><h2>Add photos of your trees</h2><p class="sub">Photos help us give you a more accurate price. Optional, but recommended.</p>
+<div class="drop"><svg><use href="#i-cam"/></svg><p>Take new pictures or choose from your phone</p>
+<div class="pbtns"><button class="btn" onclick="$('camIn').click()"><svg width="22" height="22"><use href="#i-cam"/></svg>Camera</button><button class="btn brown" onclick="$('galIn').click()"><svg width="22" height="22"><use href="#i-img"/></svg>Gallery</button></div>
+<input type="file" id="camIn" accept="image/*" capture="environment" hidden><input type="file" id="galIn" accept="image/*" multiple hidden></div>
+<div class="thumbs" id="thumbs"></div><div class="pcount" id="pcount"></div>
+<div class="tip"><svg><use href="#i-info"/></svg><span>Tip: get the whole tree in one shot, plus a close-up of anything nearby like the house, fence, or power lines.</span></div>
+</div><div class="nav"><button class="btn back" onclick="go(2)">←</button><button class="btn" onclick="calc();go(4)" id="photoNext">See my estimate →</button></div></section>
 
-<div class="card hide" id="leadCard"><h2>2. Get your exact quote</h2>
-<p>Leave your info and we'll reach out to set up a free on-site look.</p>
-<form id="leadForm">
-<label for="name">Name *</label><input id="name" required autocomplete="name">
-<label for="phone">Phone *</label><input id="phone" type="tel" required autocomplete="tel">
-<label for="email">Email (optional)</label><input id="email" type="email" autocomplete="email">
-<label for="addr">Job address or city (optional)</label><input id="addr" autocomplete="street-address">
-<label for="notes">Notes (optional)</label><textarea id="notes" rows="3" placeholder="Anything we should know?"></textarea>
-<label for="photos">Photos of the trees (optional)</label><input id="photos" type="file" accept="image/*" multiple>
-<button class="btn alt" type="submit">Send my request</button></form></div>
+<!-- STEP 4: estimate -->
+<section class="step" data-step="4">
+<div class="est"><div class="lbl">Your estimated price range</div><div class="range" id="range"></div>
+<div class="disc"><svg width="15" height="15"><use href="#i-info"/></svg>Estimate only, confirmed on-site</div>
+<div class="lines" id="lines"></div></div>
+<p class="fine">This is a rough estimate based on your answers. Your final price is confirmed after we look at the trees in person.</p>
+<div class="nav"><button class="btn back" onclick="go(3)">←</button><button class="btn brown" onclick="go(5)">Get my exact quote →</button></div></section>
 
-<div class="card hide" id="thanks"><h2>Thank you! 🌳</h2><p>We got your request and will call you soon to confirm your estimate.</p></div>
+<!-- STEP 5: contact -->
+<section class="step" data-step="5"><div class="card">
+<p class="step-lbl">Step 5 of 5</p><h2>Where should we reach you?</h2><p class="sub">We'll contact you to confirm your estimate.</p>
+<form id="leadForm" novalidate>
+<span class="fl">Name <span class="req">*</span></span><input id="name" autocomplete="name">
+<span class="fl">Phone <span class="req">*</span></span><input id="phone" type="tel" autocomplete="tel" inputmode="tel">
+<span class="fl">Email (optional)</span><input id="email" type="email" autocomplete="email">
+<span class="fl">Job address or city (optional)</span><input id="addr" autocomplete="street-address">
+<span class="fl">Notes (optional)</span><textarea id="notes" rows="3" placeholder="Gate code, best time to call, anything else"></textarea>
+<div class="err" id="err5">Please enter your name and phone number.</div>
+<div class="nav" style="margin-top:18px"><button type="button" class="btn back" onclick="go(4)">←</button><button class="btn brown" type="submit">Send my request</button></div>
+</form></div></section>
+
+<!-- DONE -->
+<section class="step" data-step="6"><div class="card done"><div class="big"><svg><use href="#i-check"/></svg></div>
+<h2>Thank you!</h2><p class="sub" style="margin:0">We got your request and will be in touch soon to confirm your estimate.</p></div></section>
 </main>
 <footer>Oaks Corp LLC · Tree removal · Trimming · Stump grinding</footer>
+
 <script>
-const $=id=>document.getElementById(id);let n=0;
-function treeHTML(type){const id='t'+(++n);return `<div class="tree" data-type="${type}" id="${id}">
-<h3>Tree <button type="button" onclick="this.closest('.tree').remove()">Remove</button></h3>
-<label>Size</label><select class="size"><option value="small">Small (under 30 ft)</option><option value="medium">Medium (30–60 ft)</option><option value="large">Large (over 60 ft)</option></select>
-<label>Is it close to anything?</label><select class="prox"><option value="none">Open area, nothing close</option><option value="house">Near a house, shed, or fence</option><option value="powerlines">Near power lines</option></select>
-<label>How easy is it to get to?</label><select class="access"><option value="easy">Easy — truck can get close</option><option value="tight">Backyard / tight space</option><option value="noequip">No equipment access</option></select>
-<label class="chk"><input type="checkbox" class="haul" checked> Clean up &amp; haul away debris</label></div>`}
-function addTree(type){$(type==='removal'?'removalList':'trimList').insertAdjacentHTML('beforeend',treeHTML(type))}
-function toggle(chk,card,list,type){$(chk).onchange=e=>{$(card).classList.toggle('hide',!e.target.checked);if(list&&e.target.checked&&!$(list).children.length)addTree(type)}}
-toggle('svcRemoval','removalCard','removalList','removal');toggle('svcTrim','trimCard','trimList','trimming');toggle('svcStump','stumpCard');
-const fmt=v=>'$'+(Math.round(v/10)*10).toLocaleString();
-function calc(){let lo=0,hi=0,any=false;
- document.querySelectorAll('.tree').forEach(t=>{if(t.closest('.card').classList.contains('hide'))return;any=true;
-  const b=PRICES[t.dataset.type][t.querySelector('.size').value];
-  const m=1+PRICES.proximity[t.querySelector('.prox').value]+PRICES.access[t.querySelector('.access').value]+(t.querySelector('.haul').checked?PRICES.haulAway:0);
-  lo+=b[0]*m;hi+=b[1]*m});
- if($('svcStump').checked){any=true;const c=Math.max(1,+$('stumpCount').value||1),d=Math.max(1,+$('stumpDia').value||1),s=PRICES.stump;
+const $=id=>document.getElementById(id);const sel=new Set();let cur=1;const photos=[];
+document.querySelectorAll('.opt').forEach(o=>o.onclick=()=>{o.classList.toggle('sel');const s=o.dataset.svc;sel.has(s)?sel.delete(s):sel.add(s);$('err1').style.display='none'});
+function go(n){cur=n;document.querySelectorAll('.step').forEach(s=>s.classList.toggle('active',+s.dataset.step===n));
+ $('bar').style.width=Math.min(n,5)*20+'%';[...$('dots').children].forEach((d,i)=>{d.className=i+1<n?'on':i+1===n?'cur':''});window.scrollTo({top:0,behavior:'smooth'})}
+function next1(){if(!sel.size){$('err1').style.display='block';return}
+ $('removalSec').style.display=sel.has('removal')?'':'none';$('trimSec').style.display=sel.has('trimming')?'':'none';$('stumpSec').style.display=sel.has('stump')?'':'none';
+ if(sel.has('removal')&&!$('removalList').children.length)addTree('removal');if(sel.has('trimming')&&!$('trimList').children.length)addTree('trimming');go(2)}
+function seg(cls,opts){return `<div class="seg" data-k="${cls}">${opts.map((o,i)=>`<button type="button" data-v="${o[0]}" class="${i?'':'sel'}">${o[1]}<small>${o[2]}</small></button>`).join('')}</div>`}
+function addTree(type){const list=$(type==='removal'?'removalList':'trimList');const el=document.createElement('div');el.className='tree';el.dataset.type=type;
+ el.innerHTML=`<div class="tree-h"><h3>Tree ${list.children.length+1}</h3><button class="x" type="button">Remove</button></div>
+ <span class="fl">Size</span>${seg('size',[['small','Small','under 30 ft'],['medium','Medium','30–60 ft'],['large','Large','60 ft +']])}
+ <span class="fl">Is it close to anything?</span>${seg('prox',[['none','Open','nothing close'],['house','Near house','shed / fence'],['powerlines','Power lines','nearby']])}
+ <span class="fl">How easy is it to reach?</span>${seg('access',[['easy','Easy','truck access'],['tight','Tight','backyard'],['noequip','No access','for equipment']])}
+ <label class="tog"><input type="checkbox" class="haul" checked><i></i>Clean up &amp; haul away debris</label>`;
+ el.querySelector('.x').onclick=()=>{el.remove();[...list.children].forEach((t,i)=>t.querySelector('h3').textContent='Tree '+(i+1))};
+ el.querySelectorAll('.seg').forEach(g=>g.onclick=e=>{const b=e.target.closest('button');if(!b)return;g.querySelectorAll('button').forEach(x=>x.classList.toggle('sel',x===b))});
+ list.appendChild(el)}
+function bump(id,d){const i=$(id);i.value=Math.max(1,(+i.value||0)+d)}
+function addFiles(files){[...files].forEach(f=>{if(!f.type.startsWith('image/'))return;photos.push({file:f,url:URL.createObjectURL(f)})});renderThumbs()}
+$('camIn').onchange=e=>{addFiles(e.target.files);e.target.value=''};$('galIn').onchange=e=>{addFiles(e.target.files);e.target.value=''};
+function renderThumbs(){$('thumbs').innerHTML='';photos.forEach((p,i)=>{const d=document.createElement('div');d.className='th';d.innerHTML=`<img src="${p.url}" alt="Tree photo ${i+1}"><button type="button" aria-label="Remove photo">×</button>`;
+ d.querySelector('button').onclick=()=>{URL.revokeObjectURL(p.url);photos.splice(i,1);renderThumbs()};$('thumbs').appendChild(d)});
+ $('pcount').textContent=photos.length?`${photos.length} photo${photos.length>1?'s':''} added ✓`:'';$('photoNext').innerHTML=photos.length?'See my estimate →':'Skip photos & see estimate →'}
+renderThumbs();
+const fmt=v=>'$'+(Math.round(v/10)*10).toLocaleString();const val=(t,k)=>t.querySelector(`.seg[data-k="${k}"] .sel`).dataset.v;
+const NAMES={removal:'Removal',trimming:'Trimming',small:'small',medium:'medium',large:'large'};
+function calc(){let lo=0,hi=0;const lines=[];
+ document.querySelectorAll('.tree').forEach(t=>{if(!sel.has(t.dataset.type))return;const b=PRICES[t.dataset.type][val(t,'size')];
+  const m=1+PRICES.proximity[val(t,'prox')]+PRICES.access[val(t,'access')]+(t.querySelector('.haul').checked?PRICES.haulAway:0);
+  lo+=b[0]*m;hi+=b[1]*m;lines.push([`${NAMES[t.dataset.type]} · ${t.querySelector('h3').textContent.toLowerCase()} (${val(t,'size')})`,fmt(b[0]*m)+'–'+fmt(b[1]*m)])});
+ if(sel.has('stump')){const c=Math.max(1,+$('stumpCount').value||1),d=Math.max(1,+$('stumpDia').value||1),s=PRICES.stump;
   let sl=c*Math.max(s.minimumPerStump[0],d*s.perInchDiameter[0]),sh=c*Math.max(s.minimumPerStump[1],d*s.perInchDiameter[1]);
-  if(lo===0){sl=Math.max(sl,s.tripMinimum[0]);sh=Math.max(sh,s.tripMinimum[1])}lo+=sl;hi+=sh}
- if(!any){alert('Please pick at least one service above.');return}
- $('range').textContent=fmt(lo)+' – '+fmt(hi);$('result').classList.remove('hide');$('leadCard').classList.remove('hide');$('result').scrollIntoView({behavior:'smooth'})}
-$('leadForm').onsubmit=e=>{e.preventDefault();
- const lead={name:$('name').value,phone:$('phone').value,email:$('email').value,address:$('addr').value,notes:$('notes').value,estimate:$('range').textContent,photos:$('photos').files.length};
- // TODO: send `lead` somewhere (e.g. Formspree or an email service). Nothing is stored or sent right now.
- console.log('Lead (not sent yet):',lead);
- $('leadCard').classList.add('hide');$('thanks').classList.remove('hide');$('thanks').scrollIntoView({behavior:'smooth'})};
+  if(lo===0){sl=Math.max(sl,s.tripMinimum[0]);sh=Math.max(sh,s.tripMinimum[1])}lo+=sl;hi+=sh;lines.push([`Stump grinding · ${c} × ${d}"`,fmt(sl)+'–'+fmt(sh)])}
+ if(photos.length)lines.push(['Photos attached',photos.length]);
+ $('range').textContent=fmt(lo)+' – '+fmt(hi);$('lines').innerHTML=lines.map(l=>`<div><span>${l[0]}</span><span>${l[1]}</span></div>`).join('')}
+$('leadForm').onsubmit=e=>{e.preventDefault();if(!$('name').value.trim()||!$('phone').value.trim()){$('err5').style.display='block';return}
+ const lead={name:$('name').value,phone:$('phone').value,email:$('email').value,address:$('addr').value,notes:$('notes').value,services:[...sel],estimate:$('range').textContent,photos:photos.map(p=>p.file)};
+ // TODO: send `lead` to a backend (e.g. Formspree or an email service). Build a FormData, append each
+ // photo with fd.append('photos', file), then fetch(ENDPOINT,{method:'POST',body:fd}).
+ // Right now nothing is stored or sent anywhere.
+ console.log('Lead (not sent yet):',lead);go(6)};
 </script>
 </body>
 </html>
