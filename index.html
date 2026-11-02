@@ -34,6 +34,7 @@ const PRICES = {
   nearHazards: { powerlines:[0.10,0.25], overlines:[0.25,0.50], house:[0.10,0.25], fence:[0.05,0.25] },
   extraHazardEach: 0.10,
   access: { wide:[0,0], mid:[0.10,0.10], tight:[0.10,0.25] },
+  truck: { yes:[0,0], no:[0.05,0.05], unsure:[0,0.05] }, // can we get a truck to the tree?
   septic: [0, 0.10],      // if in path or near tree (once)
   haulAway: [0.10, 0.25], // wood we can't chip
   // Bushier spreading hardwoods +25%
@@ -211,6 +212,7 @@ select{width:100%;font:16.5px Inter,sans-serif;padding:13px;border:2px solid #e3
 <div class="est"><div class="lbl">Your estimated price range</div><div class="range" id="range"></div>
 <div class="disc"><svg width="15" height="15"><use href="#i-info"/></svg>Estimate only, confirmed on-site</div>
 <div class="lines" id="lines"></div>
+<div class="snote" id="truckNote" style="display:none"><svg width="18" height="18" style="flex:0 0 18px"><use href="#i-info"/></svg><span>Not sure if a truck can reach the tree? No problem. If it can't, it adds about 5%. We'll check on site.</span></div>
 <div class="snote" id="septicNote" style="display:none"><svg width="18" height="18" style="flex:0 0 18px"><use href="#i-info"/></svg><span>Septic tanks and drain fields sometimes add a little cost, sometimes nothing. We'll check it on site.</span></div></div>
 <div class="snote" style="display:flex;margin-top:12px"><svg width="18" height="18" style="flex:0 0 18px"><use href="#i-info"/></svg><span><b>Why a range?</b> Every tree is different. The price depends on whether we can cut it from the ground or have to climb it, whether we haul off the wood, the type of tree (maples and oaks are bushier with heavy limbs), how easy it is to get in, and anything nearby like a house, power lines, or a fence. We'll confirm your final price after we see it.</span></div>
 <div class="sum" id="sumEst"></div>
@@ -272,6 +274,7 @@ function addTree(type){const list=$(type==='removal'?'removalList':'trimList');c
  <div class="multi" data-k="near"><button type="button" data-v="powerlines">Near power lines</button><button type="button" data-v="overlines">Hanging over / touching power lines</button><button type="button" data-v="house">House / building</button><button type="button" data-v="fence">Fence / shed / road</button><button type="button" data-v="open" data-x="1" class="full sel">Open area, nothing nearby</button></div>
  <span class="fl">How wide is the way in to the tree?</span>
  <div class="acc" data-k="access"><button type="button" data-v="wide" class="sel">Easy, 7 ft or wider<small>Trucks / equipment drive up</small></button><button type="button" data-v="mid">3–7 ft gate or path<small>Smaller equipment</small></button><button type="button" data-v="tight">Under 3 ft or none<small>Tight access, hand carry</small></button></div>
+ <span class="fl">Can we get a truck to the tree?</span>${seg('truck',[['yes','Yes',''],['no','No',''],['unsure','Not sure','']])}
  <div class="gw"><span>Gate width if known (ft)</span><input type="number" class="gwidth" min="0" step="0.5" inputmode="decimal" placeholder="optional"></div>
  <span class="fl">Is there a septic tank or drain field in the access path or near the tree?</span>
  <div class="multi" data-k="septic"><button type="button" data-v="no" data-x="1" class="sel">No</button><button type="button" data-v="unsure" data-x="1">Not sure</button><button type="button" data-v="path">Yes, in the access path</button><button type="button" data-v="near">Yes, near the tree</button></div>
@@ -313,7 +316,7 @@ const fmt=v=>'$'+(Math.round(v/10)*10).toLocaleString();const val=(t,k)=>t.query
 const NAMES={xl:'extra large',huge:'huge',removal:'Removal',trimming:'Trimming',small:'small',medium:'medium',large:'large'};
 const LBL={powerlines:'near power lines',overlines:'over/touching power lines',house:'house/building',fence:'fence/shed/road',open:'open area',wide:'7 ft+ (easy)',mid:'3–7 ft',tight:'under 3 ft',no:'no',unsure:'not sure',path:'in access path',near:'near tree'};
 const multi=(t,k)=>[...t.querySelectorAll(`.multi[data-k="${k}"] .sel`)].map(b=>b.dataset.v);
-let treeInfo=[],septicFlag=false;
+let treeInfo=[],septicFlag=false,truckFlag=false;
 const esc=x=>String(x??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const kv=rows=>'<dl class="kv">'+rows.filter(r=>r[1]!==''&&r[1]!=null).map(r=>`<dt>${r[0]}</dt><dd>${esc(r[1])}</dd>`).join('')+'</dl>';
 const grp=(title,step,body,done)=>`<div class="sg"><div class="sg-h"><b>${title}</b>${done?'':`<button class="edit" type="button" onclick="go(${step})">Edit</button>`}</div>${body}</div>`;
@@ -323,14 +326,14 @@ function summary(done){let h='<h3>Your answers</h3>';
  treeInfo.forEach((t,i)=>{h+=grp(`${SVC[t.service]} · Tree ${treeInfo.slice(0,i+1).filter(x=>x.service===t.service).length}`,2,kv([
   ['Type',t.treeType],['Size',{small:'Small (under 30 ft)',medium:'Medium (30–60 ft)',large:'Large (60–80 ft)',xl:'Extra large (80–100 ft)',huge:'Huge (100 ft+)'}[t.size]],
   ['Near',t.near.map(v=>LBL[v]).join(', ')],['Access',LBL[t.access]+(t.gateWidthFt?` · gate ${t.gateWidthFt} ft`:'')],
-  ['Trunk width',t.diameterIn?t.diameterIn+' in':''],['Trimming',t.amount==='branch'?'Just a branch or two':(t.service==='trimming'?'Full trim':'')],['Septic / drain field',t.septic.map(v=>LBL[v]).join(' + ')],['Haul away wood',t.haulAway?'Yes':'No'],['Keep wood chips',t.keepChips?'Yes, leave them':'No'],['Notes',t.notes]]),done)});
+  ['Trunk width',t.diameterIn?t.diameterIn+' in':''],['Trimming',t.amount==='branch'?'Just a branch or two':(t.service==='trimming'?'Full trim':'')],['Truck to the tree',{yes:'Yes',no:'No',unsure:'Not sure'}[t.truck]],['Septic / drain field',t.septic.map(v=>LBL[v]).join(' + ')],['Haul away wood',t.haulAway?'Yes':'No'],['Keep wood chips',t.keepChips?'Yes, leave them':'No'],['Notes',t.notes]]),done)});
  if(sel.has('stump'))h+=grp('Stump grinding',2,kv([['Stumps',$('stumpCount').value],['Avg. width',$('stumpDia').value+' in']]),done);
  h+=grp('Photos',3,kv([['Photos added',photos.length||'None']]),done);
  if(done)h+=grp('Timing &amp; contact',5,kv([['When',when||'Not chosen'],['Preferred date',$('pdate').value],['Land clearing, excavation, site prep, utilities / drainage',$('landX').checked?'Interested':'No'],['Notes',$('notes').value]]),true);
  return h}
 const SIZES=['small','medium','large','xl','huge'];
 const diaSize=d=>!d?null:d<16?'small':d<26?'medium':d<36?'large':d<48?'xl':'huge';
-function calc(){let lo=0,hi=0;const lines=[];treeInfo=[];septicFlag=false;
+function calc(){let lo=0,hi=0;const lines=[];treeInfo=[];septicFlag=false;truckFlag=false;
  document.querySelectorAll('.tree').forEach(t=>{if(!sel.has(t.dataset.type))return;
   const hs=val(t,'size'),dia=+t.querySelector('.tdia').value||0,ds=diaSize(dia);
   const size=ds&&SIZES.indexOf(ds)>SIZES.indexOf(hs)?ds:hs; // trunk width can bump size up
@@ -340,12 +343,12 @@ function calc(){let lo=0,hi=0;const lines=[];treeInfo=[];septicFlag=false;
   const hz=i=>{const a=near.map(v=>PRICES.nearHazards[v][i]).sort((x,y)=>y-x);return a.length?a[0]+PRICES.extraHazardEach*(a.length-1):0};
   const acc=t.querySelector('.acc .sel').dataset.v,sep=multi(t,'septic');
   const sepYes=sep.includes('path')||sep.includes('near');if(sepYes)septicFlag=true;
-  const gw=t.querySelector('.gwidth').value,haul=t.querySelector('.haul').checked,chips=val(t,'chips')==='yes';
+  const gw=t.querySelector('.gwidth').value,haul=t.querySelector('.haul').checked,chips=val(t,'chips')==='yes',truck=val(t,'truck');if(truck==='unsure')truckFlag=true;
   const tm=PRICES.treeType[t.querySelector('.ttype').value]||1;
-  const m=i=>tm*(1+hz(i)+PRICES.access[acc][i]+(sepYes?PRICES.septic[i]:0)+(haul?PRICES.haulAway[i]:0));
+  const m=i=>tm*(1+hz(i)+PRICES.access[acc][i]+PRICES.truck[truck][i]+(sepYes?PRICES.septic[i]:0)+(haul?PRICES.haulAway[i]:0));
   const tl=b[0]*m(0),th=b[1]*m(1);
-  const name=`${NAMES[t.dataset.type]} · ${t.querySelector('h3').textContent.toLowerCase()} (${amt==='branch'?'a branch or two':NAMES[size]})`;
-  treeInfo.push({service:t.dataset.type,size,heightSize:hs,diameterIn:dia||null,amount:amt,treeType:typeName(t),near:near.length?near:['open'],access:acc,gateWidthFt:gw||null,septic:sep,haulAway:haul,keepChips:chips,notes:t.querySelector('.tnotes').value,range:fmt(tl)+'–'+fmt(th)});
+  const name=`${NAMES[t.dataset.type]} · ${t.querySelector('h3').textContent.toLowerCase()} (${amt==='branch'?'a branch or two':NAMES[size]})${truck==='no'?' · no truck access +5%':truck==='unsure'?' · truck access not sure, +0–5%':''}`;
+  treeInfo.push({service:t.dataset.type,size,heightSize:hs,diameterIn:dia||null,amount:amt,treeType:typeName(t),near:near.length?near:['open'],access:acc,gateWidthFt:gw||null,septic:sep,haulAway:haul,keepChips:chips,truck,notes:t.querySelector('.tnotes').value,range:fmt(tl)+'–'+fmt(th)});
   lo+=tl;hi+=th;lines.push([name,fmt(tl)+'–'+fmt(th)])});
  if(sel.has('stump')){const c=Math.max(1,+$('stumpCount').value||1),d=Math.max(1,+$('stumpDia').value||1),s=PRICES.stump;
   const sl=c*Math.max(s.minimumPerStump,d*s.perInchDiameter[0]),sh=c*Math.max(s.minimumPerStump,d*s.perInchDiameter[1]);
@@ -354,7 +357,7 @@ function calc(){let lo=0,hi=0;const lines=[];treeInfo=[];septicFlag=false;
  hi=Math.max(hi,lo);
  if(photos.length)lines.push(['Photos attached',photos.length]);
  $('sumEst').innerHTML=summary(false);
- $('septicNote').style.display=septicFlag?'flex':'none';
+ $('septicNote').style.display=septicFlag?'flex':'none';$('truckNote').style.display=truckFlag?'flex':'none';
  $('range').textContent=fmt(lo)+' – '+fmt(hi);$('lines').innerHTML=lines.map(l=>`<div><span>${l[0]}</span><span>${l[1]}</span></div>`).join('')}
 $('leadForm').onsubmit=e=>{e.preventDefault();if(!$('name').value.trim()||!$('phone').value.trim()){$('err5').style.display='block';return}
  const lead={name:$('name').value,phone:$('phone').value,email:$('email').value,address:$('addr').value,notes:$('notes').value,services:[...sel],trees:treeInfo,septicOrDrainField:septicFlag,stumps:sel.has('stump')?{count:$('stumpCount').value,diameterIn:$('stumpDia').value}:null,estimate:$('range').textContent,timeline:when,preferredDate:$('pdate').value,landClearingInterest:$('landX').checked,photos:photos.map(p=>p.file)};
