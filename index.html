@@ -194,8 +194,8 @@ select{width:100%;font:16.5px Inter,sans-serif;padding:13px;border:2px solid #e3
 <div id="removalSec"><div class="sec-h"><svg><use href="#i-saw"/></svg><h3>Tree removal</h3></div><div id="removalList"></div><button class="btn ghost" onclick="addTree('removal')">+ Add another tree</button></div>
 <div id="trimSec"><div class="sec-h" style="margin-top:20px"><svg><use href="#i-trim"/></svg><h3>Tree trimming</h3></div><div id="trimList"></div><button class="btn ghost" onclick="addTree('trimming')">+ Add another tree</button></div>
 <div id="stumpSec"><div class="sec-h" style="margin-top:20px"><svg><use href="#i-stump"/></svg><h3>Stump grinding (existing stumps)</h3></div>
-<span class="fl">How many stumps?</span><div class="stepper"><button onclick="bump('stumpCount',-1)">−</button><input id="stumpCount" type="number" value="1" min="1" inputmode="numeric"><button onclick="bump('stumpCount',1)">+</button></div>
-<span class="fl">About how wide is the average stump? (inches)</span><div class="stepper"><button onclick="bump('stumpDia',-2)">−</button><input id="stumpDia" type="number" value="18" min="1" inputmode="numeric"><button onclick="bump('stumpDia',2)">+</button></div></div>
+<div id="stumpList"></div><button type="button" class="btn ghost" style="margin-top:12px" onclick="addStump()" id="addStumpBtn">+ Add another stump</button>
+</div>
 </div><div class="nav"><button class="btn back" onclick="go(1)">←</button><button class="btn" onclick="go(3)">Continue →</button></div></section>
 
 <!-- STEP 3: photos -->
@@ -497,12 +497,17 @@ function summary(done){let h='<h3>Your answers</h3>';
   ['Type',t.treeType],['Size',{small:'Small (under 30 ft)',medium:'Medium (30–60 ft)',large:'Large (60–80 ft)',xl:'Extra large (80–100 ft)',huge:'Huge (100 ft+)'}[t.size]],
   ['Near',t.near.map(v=>LBL[v]).join(', ')],['Access',LBL[t.access]+(t.gateWidthFt?` · gate ${t.gateWidthFt} ft`:'')],
   ['Trunk width',t.diameterIn?t.diameterIn+' in':''],['Trimming',t.amount==='branch'?'Just a few branches':(t.service==='trimming'?'Full trim':'')],['Truck to the tree',{yes:'Yes',no:'No',unsure:'Not sure'}[t.truck]],['Septic / drain field',t.septic.map(v=>LBL[v]).join(' + ')],['Haul away wood',t.haulAway?'Yes':'No'],['Keep wood chips',t.keepChips?'Yes, leave them':'No'],['Grind stump too',t.service==='removal'?(t.grindStump?`Yes · ${t.stumpWidthIn} in wide`:'No'):''],['Notes',t.notes],['How many like this',t.count]]),done)});
- if(sel.has('stump'))h+=grp('Stump grinding (existing stumps)',2,kv([['Stumps',$('stumpCount').value],['Avg. width',$('stumpDia').value+' in']]),done);
+ if(sel.has('stump')){const w=stumpW();h+=grp('Stump grinding (existing stumps)',2,kv([['Stumps',w.length],['Widths',w.map(x=>x+' in').join(', ')]]),done)}
  h+=grp('Photos',3,kv([['Photos added',photos.length||'None']]),done);
  if(done)h+=grp('Timing &amp; contact',5,kv([['When',when||'Not chosen'],['Preferred date',$('pdate').value],['Land clearing, excavation, site prep, utilities / drainage',$('landX').checked?'Interested':'No'],['Notes',$('notes').value]]),true);
  return h}
 const SIZES=['small','medium','large','xl','huge'];
 const diaSize=d=>!d?null:d<16?'small':d<26?'medium':d<36?'large':d<48?'xl':'huge';
+function stumpW(){return [...document.querySelectorAll('.srow .sdia')].map(i=>Math.max(1,Math.round(+i.value||18)))}
+function addStump(v){const l=$('stumpList'),r=document.createElement('div');r.className='srow';r.style.cssText='display:flex;gap:10px;align-items:center;margin-top:10px';
+ r.innerHTML=`<span class="fl sl" style="margin:0;flex:0 0 72px">Stump ${l.children.length+1}</span><input type="number" class="sdia" min="1" inputmode="numeric" value="${v||18}" style="flex:1"><span style="color:var(--mut)">in</span><button type="button" class="x">Remove</button>`;
+ r.querySelector('.x').onclick=()=>{if(l.children.length>1){r.remove();[...l.children].forEach((x,i)=>x.querySelector('.sl').textContent='Stump '+(i+1))}};l.appendChild(r)}
+addStump();
 function calc(){let lo=0,hi=0;const lines=[];treeInfo=[];septicFlag=false;truckFlag=false;
  document.querySelectorAll('.tree').forEach(t=>{if(!sel.has(t.dataset.type))return;
   const hs=val(t,'size'),dia=+t.querySelector('.tdia').value||0,ds=diaSize(dia);
@@ -525,9 +530,9 @@ function calc(){let lo=0,hi=0;const lines=[];treeInfo=[];septicFlag=false;truckF
   if(sgy){sgd=Math.max(1,+t.querySelector('.sgdia').value||dia||18);const s=PRICES.stump,one=i=>Math.max(s.minimumPerStump,sgd*s.perInchDiameter[i]),sq=i=>one(i)+(n-1)*Math.max(s.minimumPerStump,one(i)*PRICES.extraSimilar);
    lo+=sq(0);hi+=sq(1);lines.push([`Stump grinding · ${t.querySelector('h3').textContent} · ${n} × ${sgd}"${n>1?' (discount on extras)':''}`,fmt(sq(0))+'–'+fmt(sq(1))])}
   treeInfo[treeInfo.length-1].grindStump=sgy;treeInfo[treeInfo.length-1].stumpWidthIn=sgd;});
- if(sel.has('stump')){const c=Math.max(1,+$('stumpCount').value||1),d=Math.max(1,+$('stumpDia').value||1),s=PRICES.stump;
-  const one=i=>Math.max(s.minimumPerStump,d*s.perInchDiameter[i]),sq=i=>one(i)+(c-1)*Math.max(s.minimumPerStump,one(i)*PRICES.extraSimilar);const sl=sq(0),sh=sq(1);
-  lo+=sl;hi+=sh;lines.push([`Existing stumps · ${c} × ${d}"${c>1?' (discount on extras)':''}`,fmt(sl)+'–'+fmt(sh)])}
+ if(sel.has('stump')){const w=stumpW(),s=PRICES.stump,mx=Math.max(...w),one=(d,i)=>Math.max(s.minimumPerStump,d*s.perInchDiameter[i]);
+  const sq=i=>{let t=0,big=false;w.forEach(d=>{if(d===mx&&!big){big=true;t+=one(d,i)}else t+=Math.max(s.minimumPerStump,one(d,i)*PRICES.extraSimilar)});return t};
+  const sl=sq(0),sh=sq(1);lo+=sl;hi+=sh;lines.push([`Existing stumps · ${w.length} stump${w.length>1?'s':''} (${w.join(', ')} in)${w.length>1?' · discount on extras':''}`,fmt(sl)+'–'+fmt(sh)])}
  if(lo<PRICES.jobMinimum){lo=PRICES.jobMinimum;lines.push(['Job minimum',fmt(PRICES.jobMinimum)])}
  hi=Math.max(hi,lo);
  if(photos.length)lines.push(['Photos attached',photos.length]);
@@ -535,7 +540,7 @@ function calc(){let lo=0,hi=0;const lines=[];treeInfo=[];septicFlag=false;truckF
  $('septicNote').style.display=septicFlag?'flex':'none';$('truckNote').style.display=truckFlag?'flex':'none';
  $('range').textContent=fmt(lo)+' – '+fmt(hi);$('lines').innerHTML=lines.map(l=>`<div><span>${l[0]}</span><span>${l[1]}</span></div>`).join('')}
 $('leadForm').onsubmit=e=>{e.preventDefault();if(!$('name').value.trim()||!$('phone').value.trim()){$('err5').style.display='block';return}
- const lead={name:$('name').value,phone:$('phone').value,email:$('email').value,address:$('addr').value,notes:$('notes').value,services:[...sel],trees:treeInfo,septicOrDrainField:septicFlag,stumps:sel.has('stump')?{count:$('stumpCount').value,diameterIn:$('stumpDia').value}:null,estimate:$('range').textContent,timeline:when,preferredDate:$('pdate').value,landClearingInterest:$('landX').checked,photos:photos.map(p=>p.file)};
+ const lead={name:$('name').value,phone:$('phone').value,email:$('email').value,address:$('addr').value,notes:$('notes').value,services:[...sel],trees:treeInfo,septicOrDrainField:septicFlag,stumps:sel.has('stump')?{count:stumpW().length,widthsIn:stumpW()}:null,estimate:$('range').textContent,timeline:when,preferredDate:$('pdate').value,landClearingInterest:$('landX').checked,photos:photos.map(p=>p.file)};
  // TODO: send `lead` to a backend (e.g. Formspree or an email service). Build a FormData, append each
  // photo with fd.append('photos', file), then fetch(ENDPOINT,{method:'POST',body:fd}).
  // Right now nothing is stored or sent anywhere.
