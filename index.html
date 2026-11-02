@@ -182,7 +182,7 @@ select{width:100%;font:16.5px Inter,sans-serif;padding:13px;border:2px solid #e3
 <div class="opts">
 <div class="opt" data-svc="removal"><div class="ic"><svg><use href="#i-saw"/></svg></div><div><b>Tree removal</b><small>Take a tree down safely</small></div><div class="ck"><svg><use href="#i-check"/></svg></div></div>
 <div class="opt" data-svc="trimming"><div class="ic"><svg><use href="#i-trim"/></svg></div><div><b>Tree trimming</b><small>Prune, thin, or shape</small></div><div class="ck"><svg><use href="#i-check"/></svg></div></div>
-<div class="opt" data-svc="stump"><div class="ic"><svg><use href="#i-stump"/></svg></div><div><b>Stump grinding</b><small>Grind stumps below ground</small></div><div class="ck"><svg><use href="#i-check"/></svg></div></div>
+<div class="opt" data-svc="stump"><div class="ic"><svg><use href="#i-stump"/></svg></div><div><b>Stump grinding (existing stumps)</b><small>Old stumps already on the ground</small></div><div class="ck"><svg><use href="#i-check"/></svg></div></div>
 </div><div class="err" id="err1">Please pick at least one service.</div></div>
 <div class="xtra"><svg><use href="#i-leaf"/></svg><span><b>We also do land clearing, excavation, site prep, utilities &amp; drainage.</b> Ask us about it when we call.</span></div>
 <div class="fact"><div class="fact-h"><svg><use href="#i-leaf"/></svg>Did you know?</div><p class="fact-t"></p><a class="fact-s" target="_blank" rel="noopener"></a></div>
@@ -193,7 +193,7 @@ select{width:100%;font:16.5px Inter,sans-serif;padding:13px;border:2px solid #e3
 <p class="step-lbl">Step 2 of 5</p><h2>Tell us about the job</h2><p class="sub">Your best guess is fine.</p>
 <div id="removalSec"><div class="sec-h"><svg><use href="#i-saw"/></svg><h3>Tree removal</h3></div><div id="removalList"></div><button class="btn ghost" onclick="addTree('removal')">+ Add another tree</button></div>
 <div id="trimSec"><div class="sec-h" style="margin-top:20px"><svg><use href="#i-trim"/></svg><h3>Tree trimming</h3></div><div id="trimList"></div><button class="btn ghost" onclick="addTree('trimming')">+ Add another tree</button></div>
-<div id="stumpSec"><div class="sec-h" style="margin-top:20px"><svg><use href="#i-stump"/></svg><h3>Stump grinding</h3></div>
+<div id="stumpSec"><div class="sec-h" style="margin-top:20px"><svg><use href="#i-stump"/></svg><h3>Stump grinding (existing stumps)</h3></div>
 <span class="fl">How many stumps?</span><div class="stepper"><button onclick="bump('stumpCount',-1)">−</button><input id="stumpCount" type="number" value="1" min="1" inputmode="numeric"><button onclick="bump('stumpCount',1)">+</button></div>
 <span class="fl">About how wide is the average stump? (inches)</span><div class="stepper"><button onclick="bump('stumpDia',-2)">−</button><input id="stumpDia" type="number" value="18" min="1" inputmode="numeric"><button onclick="bump('stumpDia',2)">+</button></div></div>
 </div><div class="nav"><button class="btn back" onclick="go(1)">←</button><button class="btn" onclick="go(3)">Continue →</button></div></section>
@@ -284,9 +284,15 @@ function addTree(type){const list=$(type==='removal'?'removalList':'trimList');c
  <label class="tog"><input type="checkbox" class="haul"><i></i>Would you like us to haul away the wood we can't chip? (anything over about 10–13 inches thick)</label>
  <span class="fl">Do you want to keep the wood chips?</span>${seg('chips',[['no','No','we take them'],['yes','Yes','leave them']])}
  <span class="fl">Notes about this tree (optional)</span><textarea class="tnotes" rows="2" placeholder="Species, leaning, dead limbs, anything else"></textarea>
+ ${type==='removal'?`<span class="fl">Do you want the stump ground down too?</span>${seg('sg',[['no','No',''],['yes','Yes','']])}
+ <div class="sgx" style="display:none"><span class="fl">Stump width (inches)</span><input type="number" class="sgdia" min="1" inputmode="numeric" placeholder="about the same as the trunk width">
+ <div class="tip sgall" style="display:none"><svg><use href="#i-info"/></svg><span>This applies to all your similar trees.</span></div></div>`:''}
  <span class="fl">How many trees like this one?</span><div class="stepper"><button type="button" class="qm">−</button><input class="tqty" type="number" value="1" min="1" max="20" inputmode="numeric"><button type="button" class="qp">+</button></div>`;
  el.querySelector('.x').onclick=()=>{el.remove();[...list.children].forEach((t,i)=>t.querySelector('h3').textContent='Tree '+(i+1))};
  const q=el.querySelector('.tqty'),qs=d=>q.value=Math.min(20,Math.max(1,(+q.value||1)+d));el.querySelector('.qm').onclick=()=>qs(-1);el.querySelector('.qp').onclick=()=>qs(1);
+ const sgU=()=>{const g=el.querySelector('.seg[data-k="sg"] .sel');if(!g)return;const y=g.dataset.v==='yes';el.querySelector('.sgx').style.display=y?'block':'none';
+  const sd=el.querySelector('.sgdia'),td=el.querySelector('.tdia').value;if(y&&!sd.value&&td)sd.value=td;el.querySelector('.sgall').style.display=(+el.querySelector('.tqty').value>1)?'flex':'none'};
+ el.addEventListener('click',()=>setTimeout(sgU));el.addEventListener('input',()=>setTimeout(sgU));
  el.querySelector('.ttype').onchange=e=>{el.querySelector('.tother').style.display=e.target.value==='other'?'block':'none'};
  el.querySelectorAll('.multi').forEach(g=>g.onclick=e=>{const b=e.target.closest('button');if(!b)return;
   if(b.dataset.x){g.querySelectorAll('button').forEach(x=>x.classList.toggle('sel',x===b))}else{b.classList.toggle('sel');g.querySelectorAll('[data-x]').forEach(x=>x.classList.remove('sel'));
@@ -325,14 +331,14 @@ let treeInfo=[],septicFlag=false,truckFlag=false;
 const esc=x=>String(x??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const kv=rows=>'<dl class="kv">'+rows.filter(r=>r[1]!==''&&r[1]!=null).map(r=>`<dt>${r[0]}</dt><dd>${esc(r[1])}</dd>`).join('')+'</dl>';
 const grp=(title,step,body,done)=>`<div class="sg"><div class="sg-h"><b>${title}</b>${done?'':`<button class="edit" type="button" onclick="go(${step})">Edit</button>`}</div>${body}</div>`;
-const SVC={removal:'Tree removal',trimming:'Tree trimming',stump:'Stump grinding'};
+const SVC={removal:'Tree removal',trimming:'Tree trimming',stump:'Stump grinding (existing stumps)'};
 function summary(done){let h='<h3>Your answers</h3>';
  h+=grp('Services',1,kv([['Chosen',[...sel].map(v=>SVC[v]).join(', ')]]),done);
  treeInfo.forEach((t,i)=>{h+=grp(`${SVC[t.service]} · Tree ${treeInfo.slice(0,i+1).filter(x=>x.service===t.service).length}`,2,kv([
   ['Type',t.treeType],['Size',{small:'Small (under 30 ft)',medium:'Medium (30–60 ft)',large:'Large (60–80 ft)',xl:'Extra large (80–100 ft)',huge:'Huge (100 ft+)'}[t.size]],
   ['Near',t.near.map(v=>LBL[v]).join(', ')],['Access',LBL[t.access]+(t.gateWidthFt?` · gate ${t.gateWidthFt} ft`:'')],
-  ['Trunk width',t.diameterIn?t.diameterIn+' in':''],['Trimming',t.amount==='branch'?'Just a branch or two':(t.service==='trimming'?'Full trim':'')],['Truck to the tree',{yes:'Yes',no:'No',unsure:'Not sure'}[t.truck]],['Septic / drain field',t.septic.map(v=>LBL[v]).join(' + ')],['Haul away wood',t.haulAway?'Yes':'No'],['Keep wood chips',t.keepChips?'Yes, leave them':'No'],['Notes',t.notes],['How many like this',t.count]]),done)});
- if(sel.has('stump'))h+=grp('Stump grinding',2,kv([['Stumps',$('stumpCount').value],['Avg. width',$('stumpDia').value+' in']]),done);
+  ['Trunk width',t.diameterIn?t.diameterIn+' in':''],['Trimming',t.amount==='branch'?'Just a branch or two':(t.service==='trimming'?'Full trim':'')],['Truck to the tree',{yes:'Yes',no:'No',unsure:'Not sure'}[t.truck]],['Septic / drain field',t.septic.map(v=>LBL[v]).join(' + ')],['Haul away wood',t.haulAway?'Yes':'No'],['Keep wood chips',t.keepChips?'Yes, leave them':'No'],['Grind stump too',t.service==='removal'?(t.grindStump?`Yes · ${t.stumpWidthIn} in wide`:'No'):''],['Notes',t.notes],['How many like this',t.count]]),done)});
+ if(sel.has('stump'))h+=grp('Stump grinding (existing stumps)',2,kv([['Stumps',$('stumpCount').value],['Avg. width',$('stumpDia').value+' in']]),done);
  h+=grp('Photos',3,kv([['Photos added',photos.length||'None']]),done);
  if(done)h+=grp('Timing &amp; contact',5,kv([['When',when||'Not chosen'],['Preferred date',$('pdate').value],['Land clearing, excavation, site prep, utilities / drainage',$('landX').checked?'Interested':'No'],['Notes',$('notes').value]]),true);
  return h}
@@ -355,10 +361,14 @@ function calc(){let lo=0,hi=0;const lines=[];treeInfo=[];septicFlag=false;truckF
   const tl=b[0]*m(0)*qf,th=b[1]*m(1)*qf;
   const name=`${NAMES[t.dataset.type]} · ${t.querySelector('h3').textContent} (${amt==='branch'?'a branch or two':NAMES[size]})${n>1?` · ${n} similar trees (discount on extras)`:''}${truck==='no'?' · no truck access':truck==='unsure'?' · truck access not sure':''}`;
   treeInfo.push({service:t.dataset.type,size,heightSize:hs,diameterIn:dia||null,amount:amt,treeType:typeName(t),near:near.length?near:['open'],access:acc,gateWidthFt:gw||null,septic:sep,haulAway:haul,keepChips:chips,truck,count:n,notes:t.querySelector('.tnotes').value,range:fmt(tl)+'–'+fmt(th)});
-  lo+=tl;hi+=th;lines.push([name,fmt(tl)+'–'+fmt(th)])});
+  lo+=tl;hi+=th;lines.push([name,fmt(tl)+'–'+fmt(th)]);
+  const sgy=t.dataset.type==='removal'&&val(t,'sg')==='yes';let sgd=null;
+  if(sgy){sgd=Math.max(1,+t.querySelector('.sgdia').value||dia||18);const s=PRICES.stump,one=i=>Math.max(s.minimumPerStump,sgd*s.perInchDiameter[i]),sq=i=>one(i)+(n-1)*Math.max(s.minimumPerStump,one(i)*PRICES.extraSimilar);
+   lo+=sq(0);hi+=sq(1);lines.push([`Stump grinding · ${t.querySelector('h3').textContent} · ${n} × ${sgd}"${n>1?' (discount on extras)':''}`,fmt(sq(0))+'–'+fmt(sq(1))])}
+  treeInfo[treeInfo.length-1].grindStump=sgy;treeInfo[treeInfo.length-1].stumpWidthIn=sgd;});
  if(sel.has('stump')){const c=Math.max(1,+$('stumpCount').value||1),d=Math.max(1,+$('stumpDia').value||1),s=PRICES.stump;
   const one=i=>Math.max(s.minimumPerStump,d*s.perInchDiameter[i]),sq=i=>one(i)+(c-1)*Math.max(s.minimumPerStump,one(i)*PRICES.extraSimilar);const sl=sq(0),sh=sq(1);
-  lo+=sl;hi+=sh;lines.push([`Stump grinding · ${c} × ${d}"${c>1?' (discount on extras)':''}`,fmt(sl)+'–'+fmt(sh)])}
+  lo+=sl;hi+=sh;lines.push([`Existing stumps · ${c} × ${d}"${c>1?' (discount on extras)':''}`,fmt(sl)+'–'+fmt(sh)])}
  if(lo<PRICES.jobMinimum){lo=PRICES.jobMinimum;lines.push(['Job minimum',fmt(PRICES.jobMinimum)])}
  hi=Math.max(hi,lo);
  if(photos.length)lines.push(['Photos attached',photos.length]);
