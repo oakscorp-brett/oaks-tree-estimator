@@ -9,51 +9,36 @@
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <script>
 /* =====================================================================
-   PRICE CONFIG — EXAMPLE PLACEHOLDER PRICES ONLY.
-   These are NOT real Oaks Corp prices. Brett: replace every number below
-   with your own. All amounts are US dollars, given as [low, high].
+   PRICE CONFIG — Oaks Corp prices (Brett, Nov 2026). US dollars [low, high].
+   Base = easy access, nothing nearby, includes cleanup of branches, no stump.
    ===================================================================== */
 const PRICES = {
-  removal: {              // per tree (EXAMPLE placeholders)
-    small:  [300, 700],   // under 30 ft
-    medium: [700, 1500],  // 30–60 ft
-    large:  [1500, 3500], // 60–80 ft
-    xl:     [3000, 6000], // 80–100 ft
-    huge:   [5000, 10000] // 100 ft+
+  jobMinimum: 450,
+  removal: {
+    small:  [700, 900],   // under 30 ft
+    medium: [1000, 1400], // 30–60 ft
+    large:  [1500, 2700], // 60–80 ft
+    xl:     [2000, 4500], // 80–100 ft
+    huge:   [2000, 5000]  // 100 ft+
   },
-  trimming: {             // per tree (EXAMPLE placeholders)
-    small:  [150, 400],
-    medium: [400, 900],
-    large:  [900, 2000],  // 60–80 ft
-    xl:     [1500, 3000], // 80–100 ft
-    huge:   [2500, 5000]  // 100 ft+
+  trimming: {
+    small:  [500, 1000],
+    medium: [800, 2000],
+    large:  [800, 2000],
+    xl:     [800, 3000],
+    huge:   [1500, 3000]
   },
-  stump: {                // stump grinding (EXAMPLE placeholders)
-    perInchDiameter: [3, 5],  // $ per inch of diameter, per stump
-    minimumPerStump: [100, 150],
-    tripMinimum:     [150, 200] // minimum charge for a stump-only job
-  },
-  // Percent added to a tree's price (0.25 = +25%) — EXAMPLE placeholders
-  // What the tree is near — percent added (0.25 = +25%). EXAMPLE placeholders.
-  // If several are picked: the LARGEST one counts in full, plus
-  // `extraHazardEach` for every additional one picked.
-  nearHazards: { powerlines: 0.50, house: 0.25, fence: 0.15, road: 0.15 },
+  branchOnly: [450, 600], // "Just a branch or two"
+  stump: { perInchDiameter: [15, 18], minimumPerStump: 250 },
+  // Percent added [low, high]. Several picked: largest in full + extraHazardEach per extra.
+  nearHazards: { powerlines:[0.10,0.25], overlines:[0.25,0.50], house:[0.10,0.25], fence:[0.05,0.25] },
   extraHazardEach: 0.10,
-  // Access width — percent added. EXAMPLE placeholders.
-  access: {
-    wide:   0,     // Wide open, 10 ft+ (trucks/equipment drive up)
-    gate:   0.10,  // Gate or path 6–10 ft (skid steer)
-    narrow: 0.25,  // Narrow 3–6 ft (mini equipment / hand carry)
-    none:   0.45   // Under 3 ft or none (hand carry / crane)
-  },
-  // Septic tank / drain field — percent added if YES. EXAMPLE placeholders.
-  // Both can apply (they add together).
-  septic: { path: 0.15, near: 0.10 },
-  // Cleanup/haul-away, percent added to a tree's price — EXAMPLE placeholder
-  haulAway: 0.20,
-  // Tree type multiplier (1 = no change). All 1 for now — hook for later.
-  treeType: { douglasfir:1, redcedar:1, bigleafmaple:1, alder:1, oak:1, cottonwood:1,
-              hemlock:1, pine:1, birch:1, cherry:1, other:1, unsure:1 }
+  access: { wide:[0,0], mid:[0.10,0.10], tight:[0.10,0.25] },
+  septic: [0, 0.10],      // if in path or near tree (once)
+  haulAway: [0.10, 0.25], // wood we can't chip
+  // Bushier spreading hardwoods +25%
+  treeType: { douglasfir:1, redcedar:1, bigleafmaple:1.25, alder:1, oak:1.25, cottonwood:1.25,
+              hemlock:1, pine:1, birch:1.25, cherry:1.25, other:1, unsure:1 }
 };
 </script>
 <style>
@@ -226,7 +211,8 @@ select{width:100%;font:16.5px Inter,sans-serif;padding:13px;border:2px solid #e3
 <div class="est"><div class="lbl">Your estimated price range</div><div class="range" id="range"></div>
 <div class="disc"><svg width="15" height="15"><use href="#i-info"/></svg>Estimate only, confirmed on-site</div>
 <div class="lines" id="lines"></div>
-<div class="snote" id="septicNote" style="display:none"><svg width="18" height="18" style="flex:0 0 18px"><use href="#i-info"/></svg><span>Septic tanks and drain fields need careful equipment planning. We'll confirm how to protect them during the on-site visit.</span></div></div>
+<div class="snote" id="septicNote" style="display:none"><svg width="18" height="18" style="flex:0 0 18px"><use href="#i-info"/></svg><span>Septic tanks and drain fields sometimes add a little cost, sometimes nothing. We'll check it on site.</span></div></div>
+<div class="snote" style="display:flex;margin-top:12px"><svg width="18" height="18" style="flex:0 0 18px"><use href="#i-info"/></svg><span><b>Why a range?</b> Every tree is different. The price depends on whether we can cut it from the ground or have to climb it, whether we haul off the wood, the type of tree (maples and oaks are bushier with heavy limbs), how easy it is to get in, and anything nearby like a house, power lines, or a fence. We'll confirm your final price after we see it.</span></div>
 <div class="sum" id="sumEst"></div>
 <p class="fine">This is a rough estimate based on your answers. Your final price is confirmed after we look at the trees in person.</p>
 <div class="fact"><div class="fact-h"><svg><use href="#i-leaf"/></svg>Did you know?</div><p class="fact-t"></p><a class="fact-s" target="_blank" rel="noopener"></a></div>
@@ -276,17 +262,21 @@ const TYPES=[['unsure','Not sure'],['oak','Oak (Garry / Oregon white oak)'],['do
 const typeName=t=>{const v=t.querySelector('.ttype').value;return v==='other'?(t.querySelector('.tother').value.trim()||'Other'):TYPES.find(x=>x[0]===v)[1]};
 function addTree(type){const list=$(type==='removal'?'removalList':'trimList');const el=document.createElement('div');el.className='tree';el.dataset.type=type;
  el.innerHTML=`<div class="tree-h"><h3>Tree ${list.children.length+1}</h3><button class="x" type="button">Remove</button></div>
+ ${type==='trimming'?`<span class="fl">How much trimming?</span>${seg('amt',[['full','Full trim','shape / thin the tree'],['branch','Just a branch or two','usually around $450']])}`:''}
  <span class="fl">Size</span>${seg('size',[['small','Small','under 30 ft'],['medium','Medium','30–60 ft'],['large','Large','60–80 ft'],['xl','Extra large','80–100 ft'],['huge','Huge','100 ft+']])}
+ <span class="fl">Trunk width (diameter), inches <span class="hint">Optional</span></span><input type="number" class="tdia" min="1" inputmode="numeric" placeholder="e.g. 20">
+ <div class="tip"><svg><use href="#i-info"/></svg><span><b>How to measure:</b> about 5 ft off the ground, wrap a tape around the trunk and divide by 3.14. Or just estimate. Rough guide: medium 16–26 in, large 26–36, extra large 36–48, huge 48+.</span></div>
  <span class="fl">What type of tree is it?</span><select class="ttype">${TYPES.map(t=>`<option value="${t[0]}">${t[1]}</option>`).join('')}</select>
  <input class="tother" placeholder="What kind of tree?" style="display:none;margin-top:8px">
  <span class="fl">What is it near? <span class="hint">Pick all that apply</span></span>
- <div class="multi" data-k="near"><button type="button" data-v="powerlines">Power lines</button><button type="button" data-v="house">House / structure</button><button type="button" data-v="fence">Fence / shed</button><button type="button" data-v="road">Road / driveway</button><button type="button" data-v="open" data-x="1" class="full sel">Open area, nothing nearby</button></div>
+ <div class="multi" data-k="near"><button type="button" data-v="powerlines">Near power lines</button><button type="button" data-v="overlines">Hanging over / touching power lines</button><button type="button" data-v="house">House / building</button><button type="button" data-v="fence">Fence / shed / road</button><button type="button" data-v="open" data-x="1" class="full sel">Open area, nothing nearby</button></div>
  <span class="fl">How wide is the way in to the tree?</span>
- <div class="acc" data-k="access"><button type="button" data-v="wide" class="sel">Wide open, 10 ft+<small>Trucks / equipment drive up</small></button><button type="button" data-v="gate">Gate or path 6–10 ft<small>Skid steer</small></button><button type="button" data-v="narrow">Narrow 3–6 ft<small>Mini equipment / hand carry</small></button><button type="button" data-v="none">Under 3 ft or none<small>Hand carry / crane</small></button></div>
+ <div class="acc" data-k="access"><button type="button" data-v="wide" class="sel">Easy, 7 ft or wider<small>Trucks / equipment drive up</small></button><button type="button" data-v="mid">3–7 ft gate or path<small>Smaller equipment</small></button><button type="button" data-v="tight">Under 3 ft or none<small>Tight access, hand carry</small></button></div>
  <div class="gw"><span>Gate width if known (ft)</span><input type="number" class="gwidth" min="0" step="0.5" inputmode="decimal" placeholder="optional"></div>
  <span class="fl">Is there a septic tank or drain field in the access path or near the tree?</span>
  <div class="multi" data-k="septic"><button type="button" data-v="no" data-x="1" class="sel">No</button><button type="button" data-v="unsure" data-x="1">Not sure</button><button type="button" data-v="path">Yes, in the access path</button><button type="button" data-v="near">Yes, near the tree</button></div>
- <label class="tog"><input type="checkbox" class="haul" checked><i></i>Clean up &amp; haul away debris</label>
+ <label class="tog"><input type="checkbox" class="haul"><i></i>Would you like us to haul away the wood we can't chip? (anything over about 10–13 inches thick)</label>
+ <span class="fl">Do you want to keep the wood chips?</span>${seg('chips',[['no','No','we take them'],['yes','Yes','leave them']])}
  <span class="fl">Notes about this tree (optional)</span><textarea class="tnotes" rows="2" placeholder="Species, leaning, dead limbs, anything else"></textarea>`;
  el.querySelector('.x').onclick=()=>{el.remove();[...list.children].forEach((t,i)=>t.querySelector('h3').textContent='Tree '+(i+1))};
  el.querySelector('.ttype').onchange=e=>{el.querySelector('.tother').style.display=e.target.value==='other'?'block':'none'};
@@ -321,7 +311,7 @@ showFact(false);setInterval(()=>{fi++;showFact(true)},20000);
 let when='';document.querySelectorAll('.wopt').forEach(o=>o.onclick=()=>{document.querySelectorAll('.wopt').forEach(x=>x.classList.toggle('sel',x===o));when=o.dataset.v;$('emNote').style.display=when.startsWith('ASAP')?'flex':'none'});
 const fmt=v=>'$'+(Math.round(v/10)*10).toLocaleString();const val=(t,k)=>t.querySelector(`.seg[data-k="${k}"] .sel`).dataset.v;
 const NAMES={xl:'extra large',huge:'huge',removal:'Removal',trimming:'Trimming',small:'small',medium:'medium',large:'large'};
-const LBL={powerlines:'power lines',house:'house/structure',fence:'fence/shed',road:'road/driveway',open:'open area',wide:'wide open 10 ft+',gate:'gate/path 6–10 ft',narrow:'narrow 3–6 ft',none:'under 3 ft / none',no:'no',unsure:'not sure',path:'in access path',near:'near tree'};
+const LBL={powerlines:'near power lines',overlines:'over/touching power lines',house:'house/building',fence:'fence/shed/road',open:'open area',wide:'7 ft+ (easy)',mid:'3–7 ft',tight:'under 3 ft',no:'no',unsure:'not sure',path:'in access path',near:'near tree'};
 const multi=(t,k)=>[...t.querySelectorAll(`.multi[data-k="${k}"] .sel`)].map(b=>b.dataset.v);
 let treeInfo=[],septicFlag=false;
 const esc=x=>String(x??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -333,26 +323,35 @@ function summary(done){let h='<h3>Your answers</h3>';
  treeInfo.forEach((t,i)=>{h+=grp(`${SVC[t.service]} · Tree ${treeInfo.slice(0,i+1).filter(x=>x.service===t.service).length}`,2,kv([
   ['Type',t.treeType],['Size',{small:'Small (under 30 ft)',medium:'Medium (30–60 ft)',large:'Large (60–80 ft)',xl:'Extra large (80–100 ft)',huge:'Huge (100 ft+)'}[t.size]],
   ['Near',t.near.map(v=>LBL[v]).join(', ')],['Access',LBL[t.access]+(t.gateWidthFt?` · gate ${t.gateWidthFt} ft`:'')],
-  ['Septic / drain field',t.septic.map(v=>LBL[v]).join(' + ')],['Haul-away',t.haulAway?'Yes':'No'],['Notes',t.notes]]),done)});
+  ['Trunk width',t.diameterIn?t.diameterIn+' in':''],['Trimming',t.amount==='branch'?'Just a branch or two':(t.service==='trimming'?'Full trim':'')],['Septic / drain field',t.septic.map(v=>LBL[v]).join(' + ')],['Haul away wood',t.haulAway?'Yes':'No'],['Keep wood chips',t.keepChips?'Yes, leave them':'No'],['Notes',t.notes]]),done)});
  if(sel.has('stump'))h+=grp('Stump grinding',2,kv([['Stumps',$('stumpCount').value],['Avg. width',$('stumpDia').value+' in']]),done);
  h+=grp('Photos',3,kv([['Photos added',photos.length||'None']]),done);
  if(done)h+=grp('Timing &amp; contact',5,kv([['When',when||'Not chosen'],['Preferred date',$('pdate').value],['Land clearing, excavation, site prep, utilities / drainage',$('landX').checked?'Interested':'No'],['Notes',$('notes').value]]),true);
  return h}
+const SIZES=['small','medium','large','xl','huge'];
+const diaSize=d=>!d?null:d<16?'small':d<26?'medium':d<36?'large':d<48?'xl':'huge';
 function calc(){let lo=0,hi=0;const lines=[];treeInfo=[];septicFlag=false;
- document.querySelectorAll('.tree').forEach(t=>{if(!sel.has(t.dataset.type))return;const b=PRICES[t.dataset.type][val(t,'size')];
-  const near=multi(t,'near').filter(v=>v!=='open'),hz=near.map(v=>PRICES.nearHazards[v]).sort((a,b)=>b-a);
-  const hazAdd=hz.length?hz[0]+PRICES.extraHazardEach*(hz.length-1):0;
-  const acc=t.querySelector('.acc .sel').dataset.v,sep=multi(t,'septic'),sepAdd=sep.reduce((a,v)=>a+(PRICES.septic[v]||0),0);
-  if(sep.includes('path')||sep.includes('near'))septicFlag=true;
-  const gw=t.querySelector('.gwidth').value,haul=t.querySelector('.haul').checked;
-  const tm=PRICES.treeType[t.querySelector('.ttype').value]||1;const m=tm*(1+hazAdd+PRICES.access[acc]+sepAdd+(haul?PRICES.haulAway:0));
-  const name=`${NAMES[t.dataset.type]} · ${t.querySelector('h3').textContent.toLowerCase()} (${NAMES[val(t,'size')]})`;
-  const det=`Type: ${typeName(t)} · Near: ${(near.length?near:['open']).map(v=>LBL[v]).join(', ')} · Access: ${LBL[acc]}${gw?` (gate ${gw} ft)`:''} · Septic/drain field: ${sep.map(v=>LBL[v]).join(' + ')}${haul?' · Haul-away':''}`;
-  treeInfo.push({service:t.dataset.type,size:val(t,'size'),treeType:typeName(t),near:near.length?near:['open'],access:acc,gateWidthFt:gw||null,septic:sep,haulAway:haul,notes:t.querySelector('.tnotes').value,range:fmt(b[0]*m)+'–'+fmt(b[1]*m)});
-  lo+=b[0]*m;hi+=b[1]*m;lines.push([name,fmt(b[0]*m)+'–'+fmt(b[1]*m)])});
+ document.querySelectorAll('.tree').forEach(t=>{if(!sel.has(t.dataset.type))return;
+  const hs=val(t,'size'),dia=+t.querySelector('.tdia').value||0,ds=diaSize(dia);
+  const size=ds&&SIZES.indexOf(ds)>SIZES.indexOf(hs)?ds:hs; // trunk width can bump size up
+  const amt=t.dataset.type==='trimming'?val(t,'amt'):'full';
+  const b=amt==='branch'?PRICES.branchOnly:PRICES[t.dataset.type][size];
+  const near=multi(t,'near').filter(v=>v!=='open');
+  const hz=i=>{const a=near.map(v=>PRICES.nearHazards[v][i]).sort((x,y)=>y-x);return a.length?a[0]+PRICES.extraHazardEach*(a.length-1):0};
+  const acc=t.querySelector('.acc .sel').dataset.v,sep=multi(t,'septic');
+  const sepYes=sep.includes('path')||sep.includes('near');if(sepYes)septicFlag=true;
+  const gw=t.querySelector('.gwidth').value,haul=t.querySelector('.haul').checked,chips=val(t,'chips')==='yes';
+  const tm=PRICES.treeType[t.querySelector('.ttype').value]||1;
+  const m=i=>tm*(1+hz(i)+PRICES.access[acc][i]+(sepYes?PRICES.septic[i]:0)+(haul?PRICES.haulAway[i]:0));
+  const tl=b[0]*m(0),th=b[1]*m(1);
+  const name=`${NAMES[t.dataset.type]} · ${t.querySelector('h3').textContent.toLowerCase()} (${amt==='branch'?'a branch or two':NAMES[size]})`;
+  treeInfo.push({service:t.dataset.type,size,heightSize:hs,diameterIn:dia||null,amount:amt,treeType:typeName(t),near:near.length?near:['open'],access:acc,gateWidthFt:gw||null,septic:sep,haulAway:haul,keepChips:chips,notes:t.querySelector('.tnotes').value,range:fmt(tl)+'–'+fmt(th)});
+  lo+=tl;hi+=th;lines.push([name,fmt(tl)+'–'+fmt(th)])});
  if(sel.has('stump')){const c=Math.max(1,+$('stumpCount').value||1),d=Math.max(1,+$('stumpDia').value||1),s=PRICES.stump;
-  let sl=c*Math.max(s.minimumPerStump[0],d*s.perInchDiameter[0]),sh=c*Math.max(s.minimumPerStump[1],d*s.perInchDiameter[1]);
-  if(lo===0){sl=Math.max(sl,s.tripMinimum[0]);sh=Math.max(sh,s.tripMinimum[1])}lo+=sl;hi+=sh;lines.push([`Stump grinding · ${c} × ${d}"`,fmt(sl)+'–'+fmt(sh)])}
+  const sl=c*Math.max(s.minimumPerStump,d*s.perInchDiameter[0]),sh=c*Math.max(s.minimumPerStump,d*s.perInchDiameter[1]);
+  lo+=sl;hi+=sh;lines.push([`Stump grinding · ${c} × ${d}"`,fmt(sl)+'–'+fmt(sh)])}
+ if(lo<PRICES.jobMinimum){lo=PRICES.jobMinimum;lines.push(['Job minimum',fmt(PRICES.jobMinimum)])}
+ hi=Math.max(hi,lo);
  if(photos.length)lines.push(['Photos attached',photos.length]);
  $('sumEst').innerHTML=summary(false);
  $('septicNote').style.display=septicFlag?'flex':'none';
