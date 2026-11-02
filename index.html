@@ -309,13 +309,91 @@ function renderThumbs(){$('thumbs').innerHTML='';photos.forEach((p,i)=>{const d=
 renderThumbs();
 /* Tree facts — each checked against the linked source (Nov 2026). */
 const FACTS=[
-['Laminated root rot is common in Western Washington Douglas-firs. Infected trees can blow over in wind before any warning signs show in the crown.','WSU Extension (HortSense)','https://hortsense.cahnrs.wsu.edu/fact-sheet/douglas-fir-laminated-root-rot/'],
-['Root disease often goes unnoticed until a windstorm blows trees over and reveals decayed roots or hollow trunks.','USDA Forest Service hazard-tree field guide','https://www.govinfo.gov/content/pkg/GOVPUB-A13-PURL-gpo52152/pdf/GOVPUB-A13-PURL-gpo52152.pdf'],
-['The most common reasons to prune a mature tree are removing dead branches, improving its form, and reducing risk.','ISA – TreesAreGood.org','https://www.treesaregood.org/Portals/0/siteContent/pdf/Web%20TAG%20brochures/TAG_CBweb_Pruning%20Mature%20Trees_v3.pdf'],
-['"Topping" a tree makes it more dangerous: the new shoots are weakly attached and prone to breaking in wind and ice. Proper pruning or removal is safer.','ISA – TreesAreGood.org','https://www.treesaregood.org/Tree-Owner-Resources/Pruning-Your-Trees/why-topping-hurts-trees'],
-['Federal safety rules say tree work within 10 feet of a power line must be done by specially trained line-clearance tree trimmers.','OSHA','https://www.osha.gov/sites/default/files/tree_trimming_safety.pdf'],
-['Arborists suggest considering removal when a tree is dead or dying, poses unacceptable risk, crowds other trees, or is in the way of new construction.','ISA – TreesAreGood.org','https://www.treesaregood.org/Tree-Owner-Resources/Why-Hire-an-Arborist'],
-['Pruning large trees can be dangerous. Work above the ground or with power equipment should be done by trained, properly equipped crews.','ISA – TreesAreGood.org','https://www.treesaregood.org/Portals/0/siteContent/pdf/Web%20TAG%20brochures/TAG_CBweb_Pruning%20Mature%20Trees_v3.pdf']
+[
+"The tallest Douglas-fir ever recorded grew in Washington near Littlerock, not far from Tenino. It was 330 feet tall!",
+"USDA Forest Service – Silvics of North America",
+"https://research.fs.usda.gov/silvics/douglas-fir"
+],
+[
+"Lightning can heat a tree's sap so fast it turns to steam and blasts the bark right off. About half of trees hit by lightning die.",
+"NOAA National Severe Storms Lab & USDA Forest Service",
+"https://www.fs.usda.gov/inside-fs/out-and-about/when-lightning-strikes"
+],
+[
+"A tree's roots usually spread 2 to 3 times wider than its branches, so roots often reach far beyond the drip line.",
+"UC Statewide IPM Program",
+"https://ipm.ucanr.edu/home-and-landscape/provide-for-roots/"
+],
+[
+"Tree roots don't go deep. Over 90% of root mass is in the top 18 inches of soil. Shallow and wide, not deep.",
+"University of Illinois Extension",
+"https://extension.illinois.edu/blogs/garden-scoop/2024-01-27-clearing-misconceptions-around-tree-roots"
+],
+[
+"The 1962 Columbus Day Storm blew down over 11 billion board feet of timber in Oregon and Washington, about a whole year's harvest in one day.",
+"Monthly Weather Review (American Meteorological Society)",
+"https://journals.ametsoc.org/view/journals/mwre/94/2/1520-0493_1966_094_0105_daotcd_2_3_co_2.pdf"
+],
+[
+"In the 1993 Inauguration Day windstorm, falling trees helped knock out power to about 870,000 customers in Washington.",
+"University of Washington Atmospheric Sciences",
+"http://wwik.org/nwst/publish/stories/2005-winter/wind_final.pdf"
+],
+[
+"Laminated root rot is common in Western Washington Douglas-firs. Infected trees can blow over in wind before any warning signs show in the crown.",
+"WSU Extension (HortSense)",
+"https://hortsense.cahnrs.wsu.edu/fact-sheet/douglas-fir-laminated-root-rot/"
+],
+[
+"Big healthy-looking limbs can suddenly snap on hot, calm summer afternoons. Arborists call it \"summer branch drop.\"",
+"Arboriculture & Urban Forestry (ISA journal)",
+"https://auf.isa-arbor.com/content/9/4/111"
+],
+[
+"Coastal Douglas-firs often live over 500 years. The oldest on record, near Mount Vernon, WA, was over 1,400 years old.",
+"USDA Forest Service – Silvics of North America",
+"https://research.fs.usda.gov/silvics/douglas-fir"
+],
+[
+"\"Topping\" a tree makes it more dangerous: the new shoots are weakly attached and prone to breaking in wind and ice. Proper pruning or removal is safer.",
+"ISA – TreesAreGood.org",
+"https://www.treesaregood.org/Tree-Owner-Resources/Pruning-Your-Trees/why-topping-hurts-trees"
+],
+[
+"Garry oaks (Oregon white oak), Washington's only native oak, can live up to about 500 years.",
+"Washington State Capitol Campus",
+"https://capitol.wa.gov/discover/trees/garry-oak-oregon-white-oak"
+],
+[
+"Pruning tip: arborists say never remove more than about a quarter of a mature tree's living crown at once. Spread big jobs over years.",
+"ISA – TreesAreGood.org",
+"https://www.treesaregood.org/Portals/0/siteContent/pdf/Web%20TAG%20brochures/TAG_CBweb_Pruning%20Mature%20Trees_v3.pdf"
+],
+[
+"Federal safety rules say tree work within 10 feet of a power line must be done by specially trained line-clearance tree trimmers.",
+"OSHA",
+"https://www.osha.gov/sites/default/files/tree_trimming_safety.pdf"
+],
+[
+"Americans say they'd pay about 18% more for a home with trees in the yard. Healthy, well-kept trees add real value.",
+"Arbor Day Foundation",
+"https://www.arborday.org/perspectives/how-much-does-your-tree-save-you"
+],
+[
+"Western red cedar, the \"tree of life\" to Northwest tribes, often lives 800 to 1,000 years or more.",
+"USDA Forest Service – Silvics of North America",
+"https://research.fs.usda.gov/silvics/western-redcedar"
+],
+[
+"Root disease often goes unnoticed until a windstorm blows trees over and reveals decayed roots or hollow trunks.",
+"USDA Forest Service hazard-tree field guide",
+"https://www.govinfo.gov/content/pkg/GOVPUB-A13-PURL-gpo52152/pdf/GOVPUB-A13-PURL-gpo52152.pdf"
+],
+[
+"Pruning large trees can be dangerous. Work above the ground or with power equipment should be done by trained, properly equipped crews.",
+"ISA – TreesAreGood.org",
+"https://www.treesaregood.org/Portals/0/siteContent/pdf/Web%20TAG%20brochures/TAG_CBweb_Pruning%20Mature%20Trees_v3.pdf"
+]
 ];
 let fi=Math.floor(Math.random()*FACTS.length);
 function showFact(fade){const f=FACTS[fi%FACTS.length];document.querySelectorAll('.fact').forEach(c=>{const t=c.querySelector('.fact-t'),a=c.querySelector('.fact-s');
