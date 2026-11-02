@@ -112,7 +112,7 @@ input:focus,textarea:focus{outline:0;border-color:var(--g2);box-shadow:0 0 0 4px
 .pcount{text-align:center;color:var(--g2);font-weight:600;font-size:14.5px;margin-top:12px}
 .tip{display:flex;gap:10px;background:var(--gl);border-radius:14px;padding:12px 14px;margin-top:16px;font-size:14px;color:#33503a}.tip svg{flex:0 0 20px;width:20px;height:20px}
 .est{background:radial-gradient(130% 100% at 50% 0%,#2f6b3a,#1a3520);color:#fff;text-align:center;padding:28px 20px;border-radius:var(--r);box-shadow:var(--sh);position:relative;overflow:hidden}
-.est:before{content:"";position:absolute;inset:auto -40px -60px auto;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.05)}
+.est>*{position:relative;z-index:1}.est:before{content:"";z-index:0;position:absolute;inset:auto -40px -60px auto;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.05)}
 .est .lbl{font-size:13px;letter-spacing:1.3px;text-transform:uppercase;opacity:.8;font-weight:600}
 .range{font-size:38px;font-weight:800;margin:6px 0 4px;letter-spacing:-.5px}
 .est .disc{display:inline-flex;gap:6px;align-items:center;background:rgba(255,255,255,.12);padding:7px 12px;border-radius:99px;font-size:13px;font-weight:600;margin-top:6px}
