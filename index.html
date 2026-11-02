@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#1f3d24">
+<meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <title>Free Tree Service Estimate | Tenni Oaks LLC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -131,7 +132,7 @@ footer{text-align:center;font-size:13px;color:#8a8579;padding:10px 0 30px}
 .acc button small{display:block;font-weight:500;color:var(--mut);font-size:12.5px}.acc button.sel{border-color:var(--g2);background:var(--g2);color:#fff}.acc button.sel small{color:#dfeedd}
 .gw{display:flex;align-items:center;gap:10px;margin-top:10px}.gw span{font-size:14px;font-weight:600;flex:1}.gw input{width:110px;padding:10px}
 .snote{display:flex;gap:8px;text-align:left;background:rgba(255,255,255,.12);border-radius:12px;padding:10px 12px;font-size:13.5px;margin-top:12px}
-.lines .sub2{display:block;font-size:12.5px;color:var(--mut);font-weight:400;margin-top:2px;white-space:normal}
+.lines,.lines *{text-decoration:none!important}.lines .sub2{display:block;font-size:12.5px;color:var(--mut);font-weight:400;margin-top:2px;white-space:normal}
 .fact{background:#fff;border-left:5px solid var(--b2);border-radius:14px;padding:14px 16px;margin:0 0 14px;box-shadow:0 4px 14px rgba(0,0,0,.06)}
 .fact-h{display:flex;align-items:center;gap:7px;font:700 13px Montserrat,sans-serif;letter-spacing:.8px;text-transform:uppercase;color:var(--b2)}.fact-h svg{width:18px;height:18px}
 .fact-t{margin:6px 0 4px;font-size:15px;line-height:1.45;min-height:3em;transition:opacity 1s ease-in-out}.fact-s{font-size:12px;color:var(--mut);text-decoration:underline;transition:opacity 1s ease-in-out}
@@ -214,7 +215,7 @@ select{width:100%;font:16.5px Inter,sans-serif;padding:13px;border:2px solid #e3
 <div class="est"><div class="lbl">Your estimated price range</div><div class="range" id="range"></div>
 <div class="disc"><svg width="15" height="15"><use href="#i-info"/></svg>Estimate only, confirmed on-site</div>
 <div class="lines" id="lines"></div>
-<div class="snote" id="truckNote" style="display:none"><svg width="18" height="18" style="flex:0 0 18px"><use href="#i-info"/></svg><span>Not sure if a truck can reach the tree? No problem. If it can't, it adds about 5%. We'll check on site.</span></div>
+<div class="snote" id="truckNote" style="display:none"><svg width="18" height="18" style="flex:0 0 18px"><use href="#i-info"/></svg><span>Not sure if a truck can reach the tree? No problem. If it can't, it may add a little. We'll check on site.</span></div>
 <div class="snote" id="septicNote" style="display:none"><svg width="18" height="18" style="flex:0 0 18px"><use href="#i-info"/></svg><span>Septic tanks and drain fields sometimes add a little cost, sometimes nothing. We'll check it on site.</span></div></div>
 <div class="snote" style="display:flex;margin-top:12px"><svg width="18" height="18" style="flex:0 0 18px"><use href="#i-info"/></svg><span><b>Why a range?</b> Every tree is different. The price depends on whether we can cut it from the ground or have to climb it, whether we haul off the wood, the type of tree (maples and oaks are bushier with heavy limbs), how easy it is to get in, and anything nearby like a house, power lines, or a fence. We'll confirm your final price after we see it.</span></div>
 <div class="sum" id="sumEst"></div>
@@ -352,12 +353,12 @@ function calc(){let lo=0,hi=0;const lines=[];treeInfo=[];septicFlag=false;truckF
   const m=i=>tm*(1+hz(i)+PRICES.access[acc][i]+PRICES.truck[truck][i]+(sepYes?PRICES.septic[i]:0)+(haul?PRICES.haulAway[i]:0));
   const n=Math.min(PRICES.maxSimilar,Math.max(1,Math.round(+t.querySelector('.tqty').value||1))),qf=1+PRICES.extraSimilar*(n-1);
   const tl=b[0]*m(0)*qf,th=b[1]*m(1)*qf;
-  const name=`${NAMES[t.dataset.type]} · ${t.querySelector('h3').textContent.toLowerCase()} (${amt==='branch'?'a branch or two':NAMES[size]})${n>1?` · ${n} similar trees (10% off each extra)`:''}${truck==='no'?' · no truck access +5%':truck==='unsure'?' · truck access not sure, +0–5%':''}`;
+  const name=`${NAMES[t.dataset.type]} · ${t.querySelector('h3').textContent} (${amt==='branch'?'a branch or two':NAMES[size]})${n>1?` · ${n} similar trees (discount on extras)`:''}${truck==='no'?' · no truck access':truck==='unsure'?' · truck access not sure':''}`;
   treeInfo.push({service:t.dataset.type,size,heightSize:hs,diameterIn:dia||null,amount:amt,treeType:typeName(t),near:near.length?near:['open'],access:acc,gateWidthFt:gw||null,septic:sep,haulAway:haul,keepChips:chips,truck,count:n,notes:t.querySelector('.tnotes').value,range:fmt(tl)+'–'+fmt(th)});
   lo+=tl;hi+=th;lines.push([name,fmt(tl)+'–'+fmt(th)])});
  if(sel.has('stump')){const c=Math.max(1,+$('stumpCount').value||1),d=Math.max(1,+$('stumpDia').value||1),s=PRICES.stump;
   const one=i=>Math.max(s.minimumPerStump,d*s.perInchDiameter[i]),sq=i=>one(i)+(c-1)*Math.max(s.minimumPerStump,one(i)*PRICES.extraSimilar);const sl=sq(0),sh=sq(1);
-  lo+=sl;hi+=sh;lines.push([`Stump grinding · ${c} × ${d}"${c>1?' (10% off each extra)':''}`,fmt(sl)+'–'+fmt(sh)])}
+  lo+=sl;hi+=sh;lines.push([`Stump grinding · ${c} × ${d}"${c>1?' (discount on extras)':''}`,fmt(sl)+'–'+fmt(sh)])}
  if(lo<PRICES.jobMinimum){lo=PRICES.jobMinimum;lines.push(['Job minimum',fmt(PRICES.jobMinimum)])}
  hi=Math.max(hi,lo);
  if(photos.length)lines.push(['Photos attached',photos.length]);
