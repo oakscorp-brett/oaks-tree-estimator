@@ -31,7 +31,7 @@ const PRICES = {
     xl:     [800, 3000],
     huge:   [1500, 3000]
   },
-  branchOnly: [450, 600], // "Just a branch or two"
+  branchOnly: [450, 600], // "Just a few branches"
   stump: { perInchDiameter: [15, 18], minimumPerStump: 250 },
   // Percent added [low, high]. Several picked: largest in full + extraHazardEach per extra.
   nearHazards: { powerlines:[0.10,0.25], overlines:[0.25,0.50], house:[0.10,0.25], fence:[0.05,0.25] },
@@ -267,7 +267,7 @@ const TYPES=[['unsure','Not sure'],['oak','Oak (Garry / Oregon white oak)'],['do
 const typeName=t=>{const v=t.querySelector('.ttype').value;return v==='other'?(t.querySelector('.tother').value.trim()||'Other'):TYPES.find(x=>x[0]===v)[1]};
 function addTree(type){const list=$(type==='removal'?'removalList':'trimList');const el=document.createElement('div');el.className='tree';el.dataset.type=type;
  el.innerHTML=`<div class="tree-h"><h3>Tree ${list.children.length+1}</h3><button class="x" type="button">Remove</button></div>
- ${type==='trimming'?`<span class="fl">How much trimming?</span>${seg('amt',[['full','Full trim','shape / thin the tree'],['branch','Just a branch or two','usually around $450']])}`:''}
+ ${type==='trimming'?`<span class="fl">How much trimming?</span>${seg('amt',[['full','Full trim','shape / thin the tree'],['branch','Just a few branches','usually around $450']])}`:''}
  <span class="fl">Size</span>${seg('size',[['small','Small','under 30 ft'],['medium','Medium','30–60 ft'],['large','Large','60–80 ft'],['xl','Extra large','80–100 ft'],['huge','Huge','100 ft+']])}
  <span class="fl">Trunk width (diameter), inches <span class="hint">Optional</span></span><input type="number" class="tdia" min="1" inputmode="numeric" placeholder="e.g. 20">
  <div class="tip"><svg><use href="#i-info"/></svg><span><b>How to measure:</b> about 5 ft off the ground, wrap a tape around the trunk and divide by 3.14. Or just estimate. Rough guide: medium 16–26 in, large 26–36, extra large 36–48, huge 48+.</span></div>
@@ -337,7 +337,7 @@ function summary(done){let h='<h3>Your answers</h3>';
  treeInfo.forEach((t,i)=>{h+=grp(`${SVC[t.service]} · Tree ${treeInfo.slice(0,i+1).filter(x=>x.service===t.service).length}`,2,kv([
   ['Type',t.treeType],['Size',{small:'Small (under 30 ft)',medium:'Medium (30–60 ft)',large:'Large (60–80 ft)',xl:'Extra large (80–100 ft)',huge:'Huge (100 ft+)'}[t.size]],
   ['Near',t.near.map(v=>LBL[v]).join(', ')],['Access',LBL[t.access]+(t.gateWidthFt?` · gate ${t.gateWidthFt} ft`:'')],
-  ['Trunk width',t.diameterIn?t.diameterIn+' in':''],['Trimming',t.amount==='branch'?'Just a branch or two':(t.service==='trimming'?'Full trim':'')],['Truck to the tree',{yes:'Yes',no:'No',unsure:'Not sure'}[t.truck]],['Septic / drain field',t.septic.map(v=>LBL[v]).join(' + ')],['Haul away wood',t.haulAway?'Yes':'No'],['Keep wood chips',t.keepChips?'Yes, leave them':'No'],['Grind stump too',t.service==='removal'?(t.grindStump?`Yes · ${t.stumpWidthIn} in wide`:'No'):''],['Notes',t.notes],['How many like this',t.count]]),done)});
+  ['Trunk width',t.diameterIn?t.diameterIn+' in':''],['Trimming',t.amount==='branch'?'Just a few branches':(t.service==='trimming'?'Full trim':'')],['Truck to the tree',{yes:'Yes',no:'No',unsure:'Not sure'}[t.truck]],['Septic / drain field',t.septic.map(v=>LBL[v]).join(' + ')],['Haul away wood',t.haulAway?'Yes':'No'],['Keep wood chips',t.keepChips?'Yes, leave them':'No'],['Grind stump too',t.service==='removal'?(t.grindStump?`Yes · ${t.stumpWidthIn} in wide`:'No'):''],['Notes',t.notes],['How many like this',t.count]]),done)});
  if(sel.has('stump'))h+=grp('Stump grinding (existing stumps)',2,kv([['Stumps',$('stumpCount').value],['Avg. width',$('stumpDia').value+' in']]),done);
  h+=grp('Photos',3,kv([['Photos added',photos.length||'None']]),done);
  if(done)h+=grp('Timing &amp; contact',5,kv([['When',when||'Not chosen'],['Preferred date',$('pdate').value],['Land clearing, excavation, site prep, utilities / drainage',$('landX').checked?'Interested':'No'],['Notes',$('notes').value]]),true);
@@ -359,7 +359,7 @@ function calc(){let lo=0,hi=0;const lines=[];treeInfo=[];septicFlag=false;truckF
   const m=i=>tm*(1+hz(i)+PRICES.access[acc][i]+PRICES.truck[truck][i]+(sepYes?PRICES.septic[i]:0)+(haul?PRICES.haulAway[i]:0));
   const n=Math.min(PRICES.maxSimilar,Math.max(1,Math.round(+t.querySelector('.tqty').value||1))),qf=1+PRICES.extraSimilar*(n-1);
   const tl=b[0]*m(0)*qf,th=b[1]*m(1)*qf;
-  const name=`${NAMES[t.dataset.type]} · ${t.querySelector('h3').textContent} (${amt==='branch'?'a branch or two':NAMES[size]})${n>1?` · ${n} similar trees (discount on extras)`:''}${truck==='no'?' · no truck access':truck==='unsure'?' · truck access not sure':''}`;
+  const name=`${NAMES[t.dataset.type]} · ${t.querySelector('h3').textContent} (${amt==='branch'?'a few branches':NAMES[size]})${n>1?` · ${n} similar trees (discount on extras)`:''}${truck==='no'?' · no truck access':truck==='unsure'?' · truck access not sure':''}`;
   treeInfo.push({service:t.dataset.type,size,heightSize:hs,diameterIn:dia||null,amount:amt,treeType:typeName(t),near:near.length?near:['open'],access:acc,gateWidthFt:gw||null,septic:sep,haulAway:haul,keepChips:chips,truck,count:n,notes:t.querySelector('.tnotes').value,range:fmt(tl)+'–'+fmt(th)});
   lo+=tl;hi+=th;lines.push([name,fmt(tl)+'–'+fmt(th)]);
   const sgy=t.dataset.type==='removal'&&val(t,'sg')==='yes';let sgd=null;
