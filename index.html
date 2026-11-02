@@ -267,7 +267,6 @@ const typeName=t=>{const v=t.querySelector('.ttype').value;return v==='other'?(t
 function addTree(type){const list=$(type==='removal'?'removalList':'trimList');const el=document.createElement('div');el.className='tree';el.dataset.type=type;
  el.innerHTML=`<div class="tree-h"><h3>Tree ${list.children.length+1}</h3><button class="x" type="button">Remove</button></div>
  ${type==='trimming'?`<span class="fl">How much trimming?</span>${seg('amt',[['full','Full trim','shape / thin the tree'],['branch','Just a branch or two','usually around $450']])}`:''}
- <span class="fl">How many trees like this one?</span><div class="stepper"><button type="button" class="qm">−</button><input class="tqty" type="number" value="1" min="1" max="20" inputmode="numeric"><button type="button" class="qp">+</button></div>
  <span class="fl">Size</span>${seg('size',[['small','Small','under 30 ft'],['medium','Medium','30–60 ft'],['large','Large','60–80 ft'],['xl','Extra large','80–100 ft'],['huge','Huge','100 ft+']])}
  <span class="fl">Trunk width (diameter), inches <span class="hint">Optional</span></span><input type="number" class="tdia" min="1" inputmode="numeric" placeholder="e.g. 20">
  <div class="tip"><svg><use href="#i-info"/></svg><span><b>How to measure:</b> about 5 ft off the ground, wrap a tape around the trunk and divide by 3.14. Or just estimate. Rough guide: medium 16–26 in, large 26–36, extra large 36–48, huge 48+.</span></div>
@@ -283,7 +282,8 @@ function addTree(type){const list=$(type==='removal'?'removalList':'trimList');c
  <div class="multi" data-k="septic"><button type="button" data-v="no" data-x="1" class="sel">No</button><button type="button" data-v="unsure" data-x="1">Not sure</button><button type="button" data-v="path">Yes, in the access path</button><button type="button" data-v="near">Yes, near the tree</button></div>
  <label class="tog"><input type="checkbox" class="haul"><i></i>Would you like us to haul away the wood we can't chip? (anything over about 10–13 inches thick)</label>
  <span class="fl">Do you want to keep the wood chips?</span>${seg('chips',[['no','No','we take them'],['yes','Yes','leave them']])}
- <span class="fl">Notes about this tree (optional)</span><textarea class="tnotes" rows="2" placeholder="Species, leaning, dead limbs, anything else"></textarea>`;
+ <span class="fl">Notes about this tree (optional)</span><textarea class="tnotes" rows="2" placeholder="Species, leaning, dead limbs, anything else"></textarea>
+ <span class="fl">How many trees like this one?</span><div class="stepper"><button type="button" class="qm">−</button><input class="tqty" type="number" value="1" min="1" max="20" inputmode="numeric"><button type="button" class="qp">+</button></div>`;
  el.querySelector('.x').onclick=()=>{el.remove();[...list.children].forEach((t,i)=>t.querySelector('h3').textContent='Tree '+(i+1))};
  const q=el.querySelector('.tqty'),qs=d=>q.value=Math.min(20,Math.max(1,(+q.value||1)+d));el.querySelector('.qm').onclick=()=>qs(-1);el.querySelector('.qp').onclick=()=>qs(1);
  el.querySelector('.ttype').onchange=e=>{el.querySelector('.tother').style.display=e.target.value==='other'?'block':'none'};
@@ -328,9 +328,9 @@ const SVC={removal:'Tree removal',trimming:'Tree trimming',stump:'Stump grinding
 function summary(done){let h='<h3>Your answers</h3>';
  h+=grp('Services',1,kv([['Chosen',[...sel].map(v=>SVC[v]).join(', ')]]),done);
  treeInfo.forEach((t,i)=>{h+=grp(`${SVC[t.service]} · Tree ${treeInfo.slice(0,i+1).filter(x=>x.service===t.service).length}`,2,kv([
-  ['How many like this',t.count],['Type',t.treeType],['Size',{small:'Small (under 30 ft)',medium:'Medium (30–60 ft)',large:'Large (60–80 ft)',xl:'Extra large (80–100 ft)',huge:'Huge (100 ft+)'}[t.size]],
+  ['Type',t.treeType],['Size',{small:'Small (under 30 ft)',medium:'Medium (30–60 ft)',large:'Large (60–80 ft)',xl:'Extra large (80–100 ft)',huge:'Huge (100 ft+)'}[t.size]],
   ['Near',t.near.map(v=>LBL[v]).join(', ')],['Access',LBL[t.access]+(t.gateWidthFt?` · gate ${t.gateWidthFt} ft`:'')],
-  ['Trunk width',t.diameterIn?t.diameterIn+' in':''],['Trimming',t.amount==='branch'?'Just a branch or two':(t.service==='trimming'?'Full trim':'')],['Truck to the tree',{yes:'Yes',no:'No',unsure:'Not sure'}[t.truck]],['Septic / drain field',t.septic.map(v=>LBL[v]).join(' + ')],['Haul away wood',t.haulAway?'Yes':'No'],['Keep wood chips',t.keepChips?'Yes, leave them':'No'],['Notes',t.notes]]),done)});
+  ['Trunk width',t.diameterIn?t.diameterIn+' in':''],['Trimming',t.amount==='branch'?'Just a branch or two':(t.service==='trimming'?'Full trim':'')],['Truck to the tree',{yes:'Yes',no:'No',unsure:'Not sure'}[t.truck]],['Septic / drain field',t.septic.map(v=>LBL[v]).join(' + ')],['Haul away wood',t.haulAway?'Yes':'No'],['Keep wood chips',t.keepChips?'Yes, leave them':'No'],['Notes',t.notes],['How many like this',t.count]]),done)});
  if(sel.has('stump'))h+=grp('Stump grinding',2,kv([['Stumps',$('stumpCount').value],['Avg. width',$('stumpDia').value+' in']]),done);
  h+=grp('Photos',3,kv([['Photos added',photos.length||'None']]),done);
  if(done)h+=grp('Timing &amp; contact',5,kv([['When',when||'Not chosen'],['Preferred date',$('pdate').value],['Land clearing, excavation, site prep, utilities / drainage',$('landX').checked?'Interested':'No'],['Notes',$('notes').value]]),true);
