@@ -15,6 +15,7 @@
    ===================================================================== */
 const PRICES = {
   jobMinimum: 450,
+  stumpOnlyMinimum: 250, // job minimum when only existing-stump grinding is chosen
   extraSimilar: 0.90, // each extra similar tree/stump = 90% of the first (10% off)
   maxSimilar: 20,
   removal: {
@@ -533,7 +534,8 @@ function calc(){let lo=0,hi=0;const lines=[];treeInfo=[];septicFlag=false;truckF
  if(sel.has('stump')){const w=stumpW(),s=PRICES.stump,mx=Math.max(...w),one=(d,i)=>Math.max(s.minimumPerStump,d*s.perInchDiameter[i]);
   const sq=i=>{let t=0,big=false;w.forEach(d=>{if(d===mx&&!big){big=true;t+=one(d,i)}else t+=Math.max(s.minimumPerStump,one(d,i)*PRICES.extraSimilar)});return t};
   const sl=sq(0),sh=sq(1);lo+=sl;hi+=sh;lines.push([`Existing stumps · ${w.length} stump${w.length>1?'s':''} (${w.join(', ')} in)${w.length>1?' · discount on extras':''}`,fmt(sl)+'–'+fmt(sh)])}
- if(lo<PRICES.jobMinimum){lo=PRICES.jobMinimum;lines.push(['Job minimum',fmt(PRICES.jobMinimum)])}
+ const jm=(sel.has('removal')||sel.has('trimming'))?PRICES.jobMinimum:PRICES.stumpOnlyMinimum;
+ if(lo<jm){lo=jm;lines.push(['Job minimum',fmt(jm)])}
  hi=Math.max(hi,lo);
  if(photos.length)lines.push(['Photos attached',photos.length]);
  $('sumEst').innerHTML=summary(false);
