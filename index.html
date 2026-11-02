@@ -393,9 +393,90 @@ const FACTS=[
 "Pruning large trees can be dangerous. Work above the ground or with power equipment should be done by trained, properly equipped crews.",
 "ISA – TreesAreGood.org",
 "https://www.treesaregood.org/Portals/0/siteContent/pdf/Web%20TAG%20brochures/TAG_CBweb_Pruning%20Mature%20Trees_v3.pdf"
+],
+[
+"Topping a tree can strip off 50 to 100% of its leafy crown. Leaves are a tree's food factory, so it can slowly starve.",
+"ISA – TreesAreGood.org",
+"https://www.treesaregood.org/Portals/0/TreesAreGood_Why%20Topping%20Hurts_0321.pdf"
+],
+[
+"Big stubs left by topping seldom seal over. Decay can creep from the stub into the main trunk and eventually kill the tree.",
+"Arboriculture & Urban Forestry (ISA journal)",
+"https://auf.isa-arbor.com/content/12/2/50"
+],
+[
+"After topping, some trees shoot out weak sprouts as much as 20 feet in one year, often a bigger hazard than before.",
+"Kentucky Division of Forestry",
+"https://eec.ky.gov/Natural-Resources/Forestry/urban-forestry-and-community-programs/Pages/Tree-Topping.aspx"
+],
+[
+"A dead tree is much heavier and more fragile than it looks. Double a trunk's width and you roughly quadruple its weight.",
+"Washington Dept. of Fish & Wildlife",
+"https://wdfw.wa.gov/species-habitats/living/snags"
+],
+[
+"More people are killed while felling trees than during any other logging activity. Tree work is serious business.",
+"OSHA",
+"https://www.osha.gov/sites/default/files/publications/TRIM.pdf"
+],
+[
+"Loggers call broken limbs hanging loose in a tree \"widowmakers.\" Safety rules say knock them down first and never work under them.",
+"OSHA Logging eTool",
+"http://www.osha.gov/etools/logging/manual-operations/felling/hazards"
+],
+[
+"Dead trees can house more wildlife than living ones. Where a dead tree can't hit anything, a tall snag can be left for birds.",
+"Washington Dept. of Fish & Wildlife",
+"https://wdfw.wa.gov/species-habitats/living/snags"
+],
+[
+"Well-placed trees can cut a home's yearly heating and cooling bill by as much as 25%.",
+"USDA Forest Service",
+"https://research.fs.usda.gov/treesearch/34775"
+],
+[
+"For summer shade, a tree on the west side of a house saves the most energy, because it blocks the hot afternoon sun.",
+"USDA Forest Service",
+"https://research.fs.usda.gov/treesearch/61736"
+],
+[
+"A typical medium-size tree can catch about 2,380 gallons of rain a year on its leaves and bark, easing runoff.",
+"USDA Forest Service – Center for Urban Forest Research",
+"https://www.fs.usda.gov/psw/topics/urban_forestry/products/CUFR_182_UFfactsheet4.pdf"
+],
+[
+"Cut a big leaf maple and its stump fights back: one stump grew 67 sprouts reaching 17 feet tall in just 3 years. Stump grinding stops that.",
+"USDA Forest Service – Silvics of North America",
+"https://research.fs.usda.gov/silvics/bigleaf-maple"
+],
+[
+"Big leaf maple is the tallest maple in North America, topping 100 feet in some places.",
+"National Park Service",
+"https://www.nps.gov/articles/000/bigleaf-maple.htm"
+],
+[
+"Douglas-fir isn't a true fir at all. Its scientific name, Pseudotsuga, means \"false hemlock.\"",
+"National Park Service",
+"http://nps.gov/articles/000/douglas-fir.htm"
+],
+[
+"In Washington, it's state law to call 811 at least two business days before you dig, so buried lines get marked for free.",
+"Washington Utilities and Transportation Commission",
+"https://www.utc.wa.gov/public-safety/pipeline-safety/call-you-dig"
+],
+[
+"Lightning can reach about 50,000°F, roughly five times hotter than the surface of the sun.",
+"Alabama Cooperative Extension System",
+"https://www.aces.edu/blog/topics/forestry/caring-for-lightning-struck-trees/"
+],
+[
+"Big leaf maple leaves are usually up to 12 inches across, and the biggest can reach 24 inches wide.",
+"USDA Forest Service – Silvics of North America",
+"https://research.fs.usda.gov/silvics/bigleaf-maple"
 ]
 ];
-let fi=Math.floor(Math.random()*FACTS.length);
+for(let i=FACTS.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[FACTS[i],FACTS[j]]=[FACTS[j],FACTS[i]]}
+let fi=0;
 function showFact(fade){const f=FACTS[fi%FACTS.length];document.querySelectorAll('.fact').forEach(c=>{const t=c.querySelector('.fact-t'),a=c.querySelector('.fact-s');
  const set=()=>{t.textContent=f[0];a.textContent='Source: '+f[1];a.href=f[2];t.style.opacity=a.style.opacity=1};
  if(fade){t.style.opacity=a.style.opacity=0;setTimeout(set,1000)}else set()})}
